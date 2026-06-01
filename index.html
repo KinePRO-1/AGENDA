@@ -27,7 +27,7 @@
   .search-icon { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: none; }
   .tabs { position: sticky; z-index: 99; }
   .tab { border: 0; cursor: pointer; transition: background 0.2s, color 0.2s, transform 0.15s; white-space: nowrap; }
-  .content { padding-bottom: 136px; }
+  .content { padding-bottom: 104px; }
   .reminder-card { position: relative; cursor: pointer; animation: slideIn 0.25s ease; transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; }
   @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   .reminder-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 9px; }
@@ -107,24 +107,6 @@
       radial-gradient(circle at 72px 52px, rgba(12,38,49,0.07) 0 1px, transparent 1.5px);
     background-size: 86px 86px, 118px 118px;
     mask-image: linear-gradient(to bottom, transparent 0, #000 190px, #000 calc(100% - 220px), transparent 100%);
-  }
-  body::after {
-    content: "";
-    position: fixed;
-    left: 16px;
-    right: 16px;
-    bottom: 18px;
-    max-width: 398px;
-    height: 76px;
-    margin: 0 auto;
-    border-radius: 26px;
-    background: rgba(255,255,255,0.94);
-    border: 1px solid var(--border);
-    box-shadow: 0 18px 45px rgba(24,48,62,0.13);
-    z-index: 180;
-    pointer-events: none;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
   }
   button, input, textarea, select { font-family: "Inter", "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important; }
 
@@ -226,7 +208,7 @@
     box-shadow: none;
   }
 
-  .content { padding: 0 28px 136px; position: relative; z-index: 1; }
+  .content { padding: 0 28px 104px; position: relative; z-index: 1; }
   .section-title {
     color: var(--accent2);
     font-family: inherit;
@@ -322,7 +304,7 @@
   .fab {
     right: calc(50% - 190px);
     left: auto;
-    bottom: 104px;
+    bottom: 24px;
     width: 76px;
     height: 76px;
     padding: 0;
@@ -759,6 +741,11 @@ let activeCatFilter = null;
 let activeAlarmId = null;
 let internalClock = new Date();
 let alarmInterval = null;
+let firebaseDb = null;
+let firebaseStateRef = null;
+let firebaseUnsubscribe = null;
+let firebaseReady = false;
+let applyingRemoteState = false;
 const defaultCategories = ['Salud', 'Trabajo', 'Personal', 'Compras', 'Social', 'Finanzas', 'Familia', 'Otro'];
 const categoryIcons = {
   'Salud': '💊',
@@ -772,6 +759,15 @@ const categoryIcons = {
 };
 let categories = loadCategories();
 
+const firebaseConfig = {
+  apiKey: "AIzaSyB5VKkrUiwptpk-z99ORY-VF492gFD_FtA",
+  authDomain: "agenda-d3987.firebaseapp.com",
+  projectId: "agenda-d3987",
+  storageBucket: "agenda-d3987.firebasestorage.app",
+  messagingSenderId: "649656331502",
+  appId: "1:649656331502:web:3a34b5eda4e2461fab97ff"
+};
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   updateHeaderDate();
@@ -779,6 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAll();
   startAlarmChecker();
   setDefaultDateTime();
+  initFirebase();
 });
 
 function updateHeaderDate() {
@@ -798,10 +795,69 @@ function setDefaultDateTime() {
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
 function save() {
   localStorage.setItem('reminders_v3', JSON.stringify(reminders));
+  saveRemoteState();
 }
 
 function saveCategories() {
   localStorage.setItem('reminder_categories_v1', JSON.stringify(categories));
+  saveRemoteState();
+}
+
+function saveLocalState() {
+  localStorage.setItem('reminders_v3', JSON.stringify(reminders));
+  localStorage.setItem('reminder_categories_v1', JSON.stringify(categories));
+}
+
+async function initFirebase() {
+  try {
+    const [{ initializeApp }, firestore] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js")
+    ]);
+    const app = initializeApp(firebaseConfig);
+    firebaseDb = firestore.getFirestore(app);
+    firebaseStateRef = firestore.doc(firebaseDb, "agenda", "estado");
+    firebaseReady = true;
+
+    firebaseUnsubscribe = firestore.onSnapshot(firebaseStateRef, (snapshot) => {
+      if (!snapshot.exists()) {
+        saveRemoteState();
+        return;
+      }
+      const data = snapshot.data();
+      applyingRemoteState = true;
+      if (Array.isArray(data.reminders)) reminders = data.reminders;
+      if (Array.isArray(data.categories)) {
+        categories = [...new Set([...data.categories, ...reminders.map(r => r.category).filter(Boolean)])].filter(Boolean);
+      }
+      saveLocalState();
+      renderCategoryOptions();
+      renderAll();
+      applyingRemoteState = false;
+    }, (error) => {
+      firebaseReady = false;
+      console.warn("Firebase no disponible, usando localStorage.", error);
+      showToast("Firebase no disponible", "usando copia local");
+    });
+  } catch (error) {
+    firebaseReady = false;
+    console.warn("No se pudo iniciar Firebase, usando localStorage.", error);
+    showToast("Firebase no disponible", "usando copia local");
+  }
+}
+
+async function saveRemoteState() {
+  if (!firebaseReady || !firebaseStateRef || applyingRemoteState) return;
+  try {
+    const { setDoc } = await import("https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js");
+    await setDoc(firebaseStateRef, {
+      reminders,
+      categories,
+      updatedAt: Date.now()
+    }, { merge: true });
+  } catch (error) {
+    console.warn("No se pudo guardar en Firebase, usando localStorage.", error);
+  }
 }
 
 function genId() {
@@ -865,8 +921,8 @@ function renderAll() {
   let list = reminders.filter(r => {
     if (q && !r.text.toLowerCase().includes(q)) return false;
     if (activeCatFilter && r.category !== activeCatFilter) return false;
-    if (currentTab === 'pending') return r.status === 'pending';
-    if (currentTab === 'upcoming') return r.status === 'pending';
+    if (currentTab === 'pending') return r.status === 'pending' && isToday(r.date);
+    if (currentTab === 'upcoming') return r.status === 'pending' && isTomorrow(r.date);
     if (currentTab === 'done') return r.status === 'done' || r.status === 'cancelled';
     return true;
   });
@@ -878,20 +934,10 @@ function renderAll() {
     return da.localeCompare(db);
   });
 
-  if (currentTab === 'upcoming') {
-    // Next 7 days only
-    const limit = new Date(); limit.setDate(limit.getDate() + 7);
-    list = list.filter(r => {
-      if (!r.date) return false;
-      const dt = new Date(r.date + 'T' + (r.time || '00:00'));
-      return dt <= limit;
-    });
-  }
-
   // Stats
-  const pending = reminders.filter(r => r.status === 'pending').length;
-  const doneCount = reminders.filter(r => r.status === 'done').length;
-  const overdueCount = reminders.filter(r => r.status === 'pending' && isPast(r)).length;
+  const pending = reminders.filter(r => r.status === 'pending' && isToday(r.date)).length;
+  const doneCount = reminders.filter(r => r.status === 'done' && isToday(r.date)).length;
+  const overdueCount = reminders.filter(r => r.status === 'pending' && isToday(r.date) && isPast(r)).length;
 
   let html = '';
 
@@ -1019,7 +1065,7 @@ function filterByCategory(name) {
 function emptyState(tab) {
   const msgs = {
     pending: { icon: '🎉', title: '¡Todo al día!', sub: 'No tenés recordatorios pendientes.\nTocá + para agregar uno.' },
-    upcoming: { icon: '📅', title: 'Sin próximos eventos', sub: 'Los recordatorios de los próximos 7 días aparecen acá.' },
+    upcoming: { icon: '📅', title: 'Sin recordatorios mañana', sub: 'Los recordatorios con fecha de mañana aparecerán acá.' },
     done: { icon: '📋', title: 'Sin historial', sub: 'Los recordatorios completados o cancelados aparecerán acá.' },
     categories: { icon: '🏷️', title: 'Sin categorías', sub: 'Asigná categorías a tus recordatorios para organizarlos.' }
   };
