@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f0f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Recordar — Tu agenda personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0b14;
+    --surface: #141422;
+    --surface2: #1c1c2e;
+    --surface3: #252538;
+    --border: rgba(255,255,255,0.07);
+    --accent: #7c6cf5;
+    --accent2: #a78bfa;
+    --accent-glow: rgba(124,108,245,0.25);
+    --green: #34d399;
+    --green-dim: rgba(52,211,153,0.15);
+    --red: #f87171;
+    --red-dim: rgba(248,113,113,0.15);
+    --yellow: #fbbf24;
+    --yellow-dim: rgba(251,191,36,0.12);
+    --text: #e8e8f0;
+    --text2: #9090aa;
+    --text3: #5a5a72;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100dvh;
+    max-width: 430px;
+    margin: 0 auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 52px 20px 16px;
+    background: linear-gradient(180deg, rgba(124,108,245,0.08) 0%, transparent 100%);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent2), #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+
+  .header-date {
+    font-size: 12px;
+    color: var(--text3);
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  /* SEARCH */
+  .search-wrap {
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 40px 10px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input::placeholder { color: var(--text3); }
+  .search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 12px 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: var(--bg);
+    position: sticky;
+    top: 113px;
+    z-index: 99;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+
+  /* MAIN CONTENT */
+  .content {
+    padding: 8px 16px 120px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 16px 0 10px;
+  }
+
+  /* REMINDER CARD */
+  .reminder-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    animation: slideIn 0.25s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reminder-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+    background: var(--accent);
+  }
+  .reminder-card.done::before { background: var(--green); }
+  .reminder-card.cancelled::before { background: var(--red); }
+  .reminder-card.overdue::before { background: var(--yellow); }
+
+  .reminder-card.done { opacity: 0.55; }
+  .reminder-card.cancelled { opacity: 0.45; }
+
+  .reminder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .reminder-text {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+    flex: 1;
+  }
+  .reminder-card.done .reminder-text { text-decoration: line-through; color: var(--text2); }
+  .reminder-card.cancelled .reminder-text { text-decoration: line-through; }
+
+  .reminder-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .reminder-time {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent2);
+    background: rgba(124,108,245,0.12);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .reminder-card.done .reminder-time { color: var(--green); background: var(--green-dim); }
+  .reminder-card.cancelled .reminder-time { color: var(--text3); background: transparent; }
+  .reminder-card.overdue .reminder-time { color: var(--yellow); background: var(--yellow-dim); }
+
+  .reminder-date {
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .cat-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 5px;
+    background: var(--surface3);
+    color: var(--text2);
+    font-weight: 500;
+  }
+
+  .reminder-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    justify-content: flex-end;
+  }
+
+  .btn-action {
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-done { background: var(--green-dim); color: var(--green); }
+  .btn-done:active { background: var(--green); color: white; }
+  .btn-cancel { background: var(--red-dim); color: var(--red); }
+  .btn-cancel:active { background: var(--red); color: white; }
+  .btn-edit { background: var(--surface3); color: var(--text2); }
+  .btn-edit:active { background: var(--accent); color: white; }
+  .btn-delete { background: transparent; color: var(--text3); font-size: 14px; padding: 5px 8px; }
+
+  /* FAB */
+  .fab {
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    left: 20px;
+    max-width: 390px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(124,108,245,0.45);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    z-index: 200;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .fab:active { transform: scale(0.97); box-shadow: 0 4px 12px rgba(124,108,245,0.3); }
+
+  /* MODAL */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 300;
+    display: none;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s;
+  }
+  .overlay.open { display: block; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 430px;
+    margin: 0 auto;
+    background: var(--surface);
+    border-radius: 24px 24px 0 0;
+    padding: 8px 20px 40px;
+    z-index: 301;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    max-height: 90dvh;
+    overflow-y: auto;
+  }
+  .modal.open { transform: translateY(0); }
+
+  .modal-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--surface3);
+    border-radius: 2px;
+    margin: 10px auto 20px;
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+
+  .field-hint {
+    font-size: 11px;
+    color: var(--accent2);
+    margin-bottom: 6px;
+    font-style: italic;
+  }
+
+  textarea, input[type="text"], input[type="date"], input[type="time"], select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+  textarea { resize: none; min-height: 90px; line-height: 1.5; }
+  select option { background: var(--surface2); }
+
+  .parse-btn {
+    width: 100%;
+    background: rgba(124,108,245,0.15);
+    color: var(--accent2);
+    border: 1px dashed var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all 0.2s;
+  }
+  .parse-btn:active { background: var(--accent); color: white; }
+  .parse-btn.loading { opacity: 0.6; pointer-events: none; }
+
+  .parsed-preview {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-top: 10px;
+    border: 1px solid rgba(52,211,153,0.2);
+    display: none;
+  }
+  .parsed-preview.show { display: block; }
+  .parsed-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .parsed-item:last-child { border-bottom: none; }
+  .parsed-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+  .row-2 { display: flex; gap: 10px; }
+  .row-2 > * { flex: 1; }
+
+  .modal-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .btn-primary {
+    flex: 1;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px var(--accent-glow);
+    transition: all 0.15s;
+  }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text3);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-title { font-family: 'Syne', sans-serif; font-size: 16px; color: var(--text2); margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; line-height: 1.5; }
+
+  /* NOTIFICATION TOAST */
+  .toast {
+    position: fixed;
+    top: 60px;
+    left: 16px;
+    right: 16px;
+    max-width: 398px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    z-index: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px var(--accent-glow);
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-title { font-size: 13px; font-weight: 700; color: var(--accent2); margin-bottom: 3px; }
+  .toast-body { font-size: 14px; font-weight: 500; }
+  .toast-time { font-size: 12px; color: var(--text3); margin-top: 3px; }
+
+  /* NOTIFICATION BELL ALERT */
+  .alarm-dot {
+    width: 8px; height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 4px;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity:1; transform: scale(1); } 50% { opacity:0.5; transform: scale(0.7); } }
+
+  /* CATEGORIES SECTION */
+  .cat-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .cat-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cat-chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .cat-count {
+    font-size: 11px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 1px 6px;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .stat-box {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .stat-label { font-size: 11px; color: var(--text3); font-weight: 500; }
+
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(167,139,250,0.3);
+    border-top-color: var(--accent2);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .overdue-banner {
+    background: var(--yellow-dim);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--yellow);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reminder-card:active { transform: scale(0.99); }
+
+  ::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <span class="logo">⏰ Recordar</span>
+    <span class="header-date" id="headerDate"></span>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="Buscar recordatorios…" oninput="renderAll()">
+    <span class="search-icon">🔍</span>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('pending', this)">Pendientes</button>
+  <button class="tab" onclick="switchTab('upcoming', this)">Próximos</button>
+  <button class="tab" onclick="switchTab('done', this)">Completados</button>
+  <button class="tab" onclick="switchTab('categories', this)">Categorías</button>
+</div>
+
+<!-- CONTENT -->
+<div class="content" id="mainContent"></div>
+
+<!-- FAB -->
+<button class="fab" onclick="openModal()">
+  <span style="font-size:18px">+</span> Nuevo recordatorio
+</button>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeModal()"></div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title" id="modalTitle">Nuevo recordatorio</div>
+
+  <div class="field-label">Texto del recordatorio</div>
+  <div class="field-hint">💡 Podés escribir en lenguaje natural: "llamar a Juan mañana a las 10"</div>
+  <textarea id="reminderText" placeholder="¿Qué necesitás recordar?&#10;Ej: comprar pan mañana a las 8&#10;Ej: 09:00 Mariano 11:00 Yami 12:00 Mica" rows="3"></textarea>
+
+  <button class="parse-btn" id="parseBtn" onclick="parseWithAI()">
+    <span id="parseBtnIcon">✨</span> <span id="parseBtnText">Interpretar con IA</span>
+  </button>
+
+  <div class="parsed-preview" id="parsedPreview"></div>
+
+  <div class="field-label" style="margin-top:16px">O completá los datos manualmente</div>
+
+  <div class="row-2" style="margin-top:6px">
+    <div>
+      <div class="field-label">Fecha</div>
+      <input type="date" id="reminderDate">
+    </div>
+    <div>
+      <div class="field-label">Hora</div>
+      <input type="time" id="reminderTime">
+    </div>
+  </div>
+
+  <div class="field-label">Categoría (opcional)</div>
+  <select id="reminderCat">
+    <option value="">Sin categoría</option>
+    <option value="Salud">💊 Salud</option>
+    <option value="Trabajo">💼 Trabajo</option>
+    <option value="Personal">👤 Personal</option>
+    <option value="Compras">🛒 Compras</option>
+    <option value="Social">🤝 Social</option>
+    <option value="Finanzas">💰 Finanzas</option>
+    <option value="Familia">👨‍👩‍👧 Familia</option>
+    <option value="Otro">📌 Otro</option>
+  </select>
+
+  <div class="modal-btns">
+    <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+    <button class="btn-primary" onclick="saveReminder()">Guardar</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-title">⏰ ¡Recordatorio!</div>
+  <div class="toast-body" id="toastBody"></div>
+  <div class="toast-time" id="toastTime"></div>
+</div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let reminders = JSON.parse(localStorage.getItem('reminders_v3') || '[]');
+let currentTab = 'pending';
+let editingId = null;
+let pendingParsed = [];
+let activeCatFilter = null;
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  updateHeaderDate();
+  renderAll();
+  startAlarmChecker();
+  setDefaultDateTime();
+});
+
+function updateHeaderDate() {
+  const d = new Date();
+  const opts = { weekday:'long', day:'numeric', month:'long' };
+  document.getElementById('headerDate').textContent =
+    d.toLocaleDateString('es-AR', opts);
+}
+
+function setDefaultDateTime() {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + 30);
+  document.getElementById('reminderDate').value = toDateInput(now);
+  document.getElementById('reminderTime').value = toTimeInput(now);
+}
+
+// ─── STORAGE ──────────────────────────────────────────────────────────────────
+function save() {
+  localStorage.setItem('reminders_v3', JSON.stringify(reminders));
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function toDateInput(d) {
+  return d.toISOString().slice(0, 10);
+}
+function toTimeInput(d) {
+  return d.toTimeString().slice(0, 5);
+}
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, day] = dateStr.split('-');
+  const d = new Date(+y, +m - 1, +day);
+  const opts = { weekday:'short', day:'numeric', month:'short' };
+  return d.toLocaleDateString('es-AR', opts);
+}
+function isToday(dateStr) {
+  return dateStr === toDateInput(new Date());
+}
+function isTomorrow(dateStr) {
+  const t = new Date(); t.setDate(t.getDate() + 1);
+  return dateStr === toDateInput(t);
+}
+function isPast(r) {
+  if (!r.date || !r.time) return false;
+  const dt = new Date(r.date + 'T' + r.time);
+  return dt < new Date();
+}
+function friendlyDate(dateStr) {
+  if (!dateStr) return '';
+  if (isToday(dateStr)) return 'Hoy';
+  if (isTomorrow(dateStr)) return 'Mañana';
+  return formatDate(dateStr);
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(tab, el) {
+  currentTab = tab;
+  activeCatFilter = null;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderAll() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const c = document.getElementById('mainContent');
+
+  if (currentTab === 'categories') {
+    renderCategories(c, q);
+    return;
+  }
+
+  let list = reminders.filter(r => {
+    if (q && !r.text.toLowerCase().includes(q)) return false;
+    if (activeCatFilter && r.category !== activeCatFilter) return false;
+    if (currentTab === 'pending') return r.status === 'pending';
+    if (currentTab === 'upcoming') return r.status === 'pending';
+    if (currentTab === 'done') return r.status === 'done' || r.status === 'cancelled';
+    return true;
+  });
+
+  // Sort
+  list.sort((a, b) => {
+    const da = (a.date || '9999') + 'T' + (a.time || '00:00');
+    const db = (b.date || '9999') + 'T' + (b.time || '00:00');
+    return da.localeCompare(db);
+  });
+
+  if (currentTab === 'upcoming') {
+    // Next 7 days only
+    const limit = new Date(); limit.setDate(limit.getDate() + 7);
+    list = list.filter(r => {
+      if (!r.date) return false;
+      const dt = new Date(r.date + 'T' + (r.time || '00:00'));
+      return dt <= limit;
+    });
+  }
+
+  // Stats
+  const pending = reminders.filter(r => r.status === 'pending').length;
+  const doneCount = reminders.filter(r => r.status === 'done').length;
+  const overdueCount = reminders.filter(r => r.status === 'pending' && isPast(r)).length;
+
+  let html = '';
+
+  if (currentTab === 'pending') {
+    html += `<div class="stats-bar">
+      <div class="stat-box"><div class="stat-num" style="color:var(--accent2)">${pending}</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--green)">${doneCount}</div><div class="stat-label">Completados</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--yellow)">${overdueCount}</div><div class="stat-label">Vencidos</div></div>
+    </div>`;
+    if (overdueCount > 0) {
+      html += `<div class="overdue-banner">⚠️ Tenés ${overdueCount} recordatorio${overdueCount > 1 ? 's' : ''} vencido${overdueCount > 1 ? 's' : ''}.</div>`;
+    }
+  }
+
+  if (list.length === 0) {
+    html += emptyState(currentTab);
+  } else {
+    // Group by date
+    const groups = {};
+    list.forEach(r => {
+      const key = r.date || 'sin-fecha';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(r);
+    });
+
+    Object.keys(groups).sort().forEach(key => {
+      const label = key === 'sin-fecha' ? 'Sin fecha' : friendlyDate(key);
+      html += `<div class="section-title">${label}</div>`;
+      groups[key].forEach(r => { html += renderCard(r); });
+    });
+  }
+
+  c.innerHTML = html;
+}
+
+function renderCard(r) {
+  const overdue = r.status === 'pending' && isPast(r);
+  const cls = overdue ? 'overdue' : r.status;
+  const statusIcon = r.status === 'done' ? '✅' : r.status === 'cancelled' ? '🚫' : overdue ? '⚠️' : '';
+
+  const actions = r.status === 'pending'
+    ? `<button class="btn-action btn-done" onclick="markDone('${r.id}')">✓ Hecho</button>
+       <button class="btn-action btn-cancel" onclick="markCancelled('${r.id}')">✕ Cancelar</button>
+       <button class="btn-action btn-edit" onclick="editReminder('${r.id}')">✎</button>
+       <button class="btn-action btn-delete" onclick="deleteReminder('${r.id}')">🗑</button>`
+    : `<button class="btn-action btn-edit" onclick="undoStatus('${r.id}')">↩ Reactivar</button>
+       <button class="btn-action btn-delete" onclick="deleteReminder('${r.id}')">🗑</button>`;
+
+  return `<div class="reminder-card ${cls}" id="card-${r.id}">
+    <div class="reminder-header">
+      <div class="reminder-text">${statusIcon ? statusIcon + ' ' : ''}${escHtml(r.text)}</div>
+    </div>
+    <div class="reminder-meta">
+      ${r.time ? `<span class="reminder-time">🕐 ${r.time}</span>` : ''}
+      ${r.date ? `<span class="reminder-date">${friendlyDate(r.date)}</span>` : ''}
+      ${r.category ? `<span class="cat-badge">${r.category}</span>` : ''}
+    </div>
+    <div class="reminder-actions">${actions}</div>
+  </div>`;
+}
+
+function renderCategories(c, q) {
+  const cats = {};
+  reminders.forEach(r => {
+    const k = r.category || '(Sin categoría)';
+    if (!cats[k]) cats[k] = { total: 0, pending: 0 };
+    cats[k].total++;
+    if (r.status === 'pending') cats[k].pending++;
+  });
+
+  const catIcons = {
+    'Salud': '💊', 'Trabajo': '💼', 'Personal': '👤', 'Compras': '🛒',
+    'Social': '🤝', 'Finanzas': '💰', 'Familia': '👨‍👩‍👧', 'Otro': '📌',
+    '(Sin categoría)': '📂'
+  };
+
+  let html = '<div class="section-title">Categorías</div><div class="cat-list">';
+  if (Object.keys(cats).length === 0) {
+    html += '</div>' + emptyState('categories');
+    c.innerHTML = html;
+    return;
+  }
+
+  Object.entries(cats).sort((a,b) => b[1].pending - a[1].pending).forEach(([name, info]) => {
+    const icon = catIcons[name] || '📌';
+    const isActive = activeCatFilter === name;
+    html += `<div class="cat-chip ${isActive ? 'active' : ''}" onclick="filterByCategory('${name}')">
+      ${icon} ${name} <span class="cat-count">${info.pending}/${info.total}</span>
+    </div>`;
+  });
+  html += '</div>';
+
+  if (activeCatFilter) {
+    const filtered = reminders.filter(r =>
+      (r.category || '(Sin categoría)') === activeCatFilter &&
+      (q ? r.text.toLowerCase().includes(q) : true)
+    );
+    html += `<div class="section-title" style="margin-top:20px">${activeCatFilter}</div>`;
+    if (filtered.length === 0) {
+      html += '<p style="color:var(--text3);font-size:13px;padding:12px 0">No hay recordatorios en esta categoría.</p>';
+    } else {
+      filtered.sort((a,b) => ((a.date||'9999')+'T'+(a.time||'00:00')).localeCompare((b.date||'9999')+'T'+(b.time||'00:00')))
+        .forEach(r => { html += renderCard(r); });
+    }
+  }
+
+  c.innerHTML = html;
+}
+
+function filterByCategory(name) {
+  activeCatFilter = activeCatFilter === name ? null : name;
+  renderAll();
+}
+
+function emptyState(tab) {
+  const msgs = {
+    pending: { icon: '🎉', title: '¡Todo al día!', sub: 'No tenés recordatorios pendientes.\nTocá + para agregar uno.' },
+    upcoming: { icon: '📅', title: 'Sin próximos eventos', sub: 'Los recordatorios de los próximos 7 días aparecen acá.' },
+    done: { icon: '📋', title: 'Sin historial', sub: 'Los recordatorios completados o cancelados aparecerán acá.' },
+    categories: { icon: '🏷️', title: 'Sin categorías', sub: 'Asigná categorías a tus recordatorios para organizarlos.' }
+  };
+  const m = msgs[tab] || msgs.pending;
+  return `<div class="empty">
+    <div class="empty-icon">${m.icon}</div>
+    <div class="empty-title">${m.title}</div>
+    <div class="empty-sub">${m.sub.replace(/\n/g,'<br>')}</div>
+  </div>`;
+}
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+function markDone(id) {
+  const r = reminders.find(x => x.id === id);
+  if (r) { r.status = 'done'; save(); renderAll(); }
+}
+function markCancelled(id) {
+  const r = reminders.find(x => x.id === id);
+  if (r) { r.status = 'cancelled'; save(); renderAll(); }
+}
+function undoStatus(id) {
+  const r = reminders.find(x => x.id === id);
+  if (r) { r.status = 'pending'; save(); renderAll(); }
+}
+function deleteReminder(id) {
+  reminders = reminders.filter(x => x.id !== id);
+  save(); renderAll();
+}
+
+function editReminder(id) {
+  const r = reminders.find(x => x.id === id);
+  if (!r) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Editar recordatorio';
+  document.getElementById('reminderText').value = r.text;
+  document.getElementById('reminderDate').value = r.date || '';
+  document.getElementById('reminderTime').value = r.time || '';
+  document.getElementById('reminderCat').value = r.category || '';
+  document.getElementById('parsedPreview').classList.remove('show');
+  pendingParsed = [];
+  openModal();
+}
+
+// ─── MODAL ───────────────────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('modal').classList.add('open');
+  setTimeout(() => document.getElementById('reminderText').focus(), 350);
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('modal').classList.remove('open');
+  editingId = null;
+  pendingParsed = [];
+  document.getElementById('modalTitle').textContent = 'Nuevo recordatorio';
+  document.getElementById('reminderText').value = '';
+  document.getElementById('parsedPreview').classList.remove('show');
+  setDefaultDateTime();
+  document.getElementById('reminderCat').value = '';
+}
+
+// ─── SAVE ─────────────────────────────────────────────────────────────────────
+function saveReminder() {
+  // If we have AI-parsed multi-reminders, save them all
+  if (pendingParsed.length > 1) {
+    const cat = document.getElementById('reminderCat').value;
+    pendingParsed.forEach(p => {
+      reminders.unshift({
+        id: genId(),
+        text: p.text,
+        date: p.date,
+        time: p.time,
+        category: cat,
+        status: 'pending',
+        created: Date.now(),
+        notified: false
+      });
+    });
+    save(); renderAll(); closeModal();
+    showToast('💡 ' + pendingParsed.length + ' recordatorios guardados', '');
+    return;
+  }
+
+  const text = document.getElementById('reminderText').value.trim();
+  if (!text) { alert('Escribí el texto del recordatorio.'); return; }
+
+  const date = document.getElementById('reminderDate').value;
+  const time = document.getElementById('reminderTime').value;
+  const category = document.getElementById('reminderCat').value;
+
+  if (editingId) {
+    const r = reminders.find(x => x.id === editingId);
+    if (r) { r.text = text; r.date = date; r.time = time; r.category = category; r.notified = false; }
+  } else {
+    reminders.unshift({ id: genId(), text, date, time, category, status: 'pending', created: Date.now(), notified: false });
+  }
+
+  save(); renderAll(); closeModal();
+}
+
+// ─── AI PARSE ─────────────────────────────────────────────────────────────────
+async function parseWithAI() {
+  const text = document.getElementById('reminderText').value.trim();
+  if (!text) { alert('Primero escribí el texto a interpretar.'); return; }
+
+  const btn = document.getElementById('parseBtn');
+  const icon = document.getElementById('parseBtnIcon');
+  const label = document.getElementById('parseBtnText');
+  btn.classList.add('loading');
+  icon.innerHTML = '<span class="spinner"></span>';
+  label.textContent = 'Interpretando…';
+
+  const today = new Date();
+  const todayStr = toDateInput(today);
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+  const tomorrowStr = toDateInput(tomorrow);
+
+  // Day name → date mapping (next 7 days)
+  const dayNames = { lunes:0, martes:1, miércoles:2, miercoles:2, jueves:3, viernes:4, sábado:5, sabado:5, domingo:6 };
+  const dayMap = {};
+  for (let i = 0; i <= 6; i++) {
+    const d = new Date(today); d.setDate(today.getDate() + i);
+    const name = d.toLocaleDateString('es-AR',{weekday:'long'}).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    dayMap[name] = toDateInput(d);
+  }
+
+  const systemPrompt = `Sos un asistente que extrae recordatorios de texto en español argentino.
+Hoy es ${todayStr} (${today.toLocaleDateString('es-AR',{weekday:'long'})}).
+Mañana es ${tomorrowStr}.
+Los días de la semana próximos: ${JSON.stringify(dayMap)}.
+
+Tu tarea: analizar el texto del usuario y extraer UNO o VARIOS recordatorios.
+Devolvé SOLO un JSON válido con este formato (sin texto extra, sin markdown):
+{"reminders":[{"text":"texto del recordatorio","date":"YYYY-MM-DD o null","time":"HH:MM o null"}]}
+
+Ejemplos de entrada y salida:
+- "comprar pan mañana a las 8" → {"reminders":[{"text":"Comprar pan","date":"${tomorrowStr}","time":"08:00"}]}
+- "llamar a Juan el viernes a las 10" → {"reminders":[{"text":"Llamar a Juan","date":"<próximo viernes>","time":"10:00"}]}
+- "09:00 Mariano 11:00 Yami 12:00 Mica" → {"reminders":[{"text":"Mariano","date":"${todayStr}","time":"09:00"},{"text":"Yami","date":"${todayStr}","time":"11:00"},{"text":"Mica","date":"${todayStr}","time":"12:00"}]}
+- "tomar medicamento hoy a las 20" → {"reminders":[{"text":"Tomar medicamento","date":"${todayStr}","time":"20:00"}]}
+- "reunión de trabajo" → {"reminders":[{"text":"Reunión de trabajo","date":null,"time":null}]}
+
+Reglas:
+- El campo "text" debe ser conciso y descriptivo (sin la fecha/hora).
+- Si hay múltiples horarios en el texto, separalos en recordatorios distintos.
+- Si no hay fecha, usá null.
+- Si no hay hora, usá null.
+- Devolvé SOLO el JSON, sin explicaciones.`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: text }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content?.find(b => b.type === 'text')?.text || '';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+
+    pendingParsed = parsed.reminders || [];
+
+    if (pendingParsed.length === 0) throw new Error('Sin resultados');
+
+    // Update form with first result
+    document.getElementById('reminderText').value = pendingParsed[0].text;
+    if (pendingParsed[0].date) document.getElementById('reminderDate').value = pendingParsed[0].date;
+    if (pendingParsed[0].time) document.getElementById('reminderTime').value = pendingParsed[0].time;
+
+    // Show preview
+    let previewHtml = `<div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:8px">✅ ${pendingParsed.length === 1 ? '1 recordatorio detectado' : pendingParsed.length + ' recordatorios detectados'}</div>`;
+    pendingParsed.forEach(p => {
+      previewHtml += `<div class="parsed-item">
+        <span class="parsed-dot"></span>
+        <span><strong>${escHtml(p.text)}</strong>${p.date ? ' · ' + friendlyDate(p.date) : ''}${p.time ? ' · ' + p.time : ''}</span>
+      </div>`;
+    });
+    document.getElementById('parsedPreview').innerHTML = previewHtml;
+    document.getElementById('parsedPreview').classList.add('show');
+
+  } catch(e) {
+    pendingParsed = [];
+    document.getElementById('parsedPreview').innerHTML = '<div style="font-size:13px;color:var(--text3)">No se pudo interpretar. Completá los campos manualmente.</div>';
+    document.getElementById('parsedPreview').classList.add('show');
+  }
+
+  btn.classList.remove('loading');
+  icon.innerHTML = '✨';
+  label.textContent = 'Interpretar con IA';
+}
+
+// ─── ALARM CHECKER ────────────────────────────────────────────────────────────
+function startAlarmChecker() {
+  checkAlarms();
+  setInterval(checkAlarms, 30000); // Every 30s
+}
+
+function checkAlarms() {
+  const now = new Date();
+  const nowStr = toDateInput(now);
+  const nowTime = toTimeInput(now);
+
+  reminders.forEach(r => {
+    if (r.status !== 'pending' || r.notified) return;
+    if (!r.date || !r.time) return;
+    if (r.date === nowStr && r.time === nowTime) {
+      r.notified = true;
+      save();
+      showToast(r.text, r.time);
+      // Also try Web Notifications API
+      if (Notification?.permission === 'granted') {
+        new Notification('⏰ Recordar', { body: r.text, icon: '' });
+      }
+    }
+  });
+}
+
+function showToast(text, time) {
+  document.getElementById('toastBody').textContent = text;
+  document.getElementById('toastTime').textContent = time ? '🕐 ' + time : '';
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
+
+// Request notification permission on first interaction
+document.addEventListener('click', () => {
+  if (Notification?.permission === 'default') Notification.requestPermission();
+}, { once: true });
+</script>
+</body>
+</html>
