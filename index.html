@@ -241,6 +241,7 @@
   .reminder-card {
     background: rgba(255,255,255,0.92);
     border: 1px solid var(--border);
+    border-left: 5px solid var(--border);
     border-radius: 22px;
     padding: 16px 16px 14px;
     margin: 0 0 14px 68px;
@@ -253,8 +254,8 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 0 7px rgba(8,148,83,0.10);
+    background: var(--status-color, var(--accent));
+    box-shadow: 0 0 0 7px var(--status-glow, rgba(8,148,83,0.10));
   }
   .reminder-card::after {
     content: "";
@@ -264,18 +265,30 @@
     width: 2px;
     height: calc(100% + 36px);
     border-radius: 2px;
-    background: linear-gradient(to bottom, transparent, rgba(8,148,83,0.22) 18%, rgba(8,148,83,0.22) 82%, transparent);
+    background: linear-gradient(to bottom, transparent, var(--status-line, rgba(8,148,83,0.22)) 18%, var(--status-line, rgba(8,148,83,0.22)) 82%, transparent);
     z-index: -1;
   }
-  .reminder-card.pending:nth-of-type(3n), .reminder-card.overdue {
-    background: linear-gradient(135deg, rgba(232,248,237,0.96), rgba(255,255,255,0.94));
+  .reminder-card.pending,
+  .reminder-card.overdue {
+    --status-color: #f59e0b;
+    --status-glow: rgba(245,158,11,0.16);
+    --status-line: rgba(245,158,11,0.24);
+    background: linear-gradient(135deg, #fff7e6, #fffaf0);
+    border-color: #f59e0b;
   }
-  .reminder-card.pending:nth-of-type(4n) {
-    background: linear-gradient(135deg, rgba(255,247,213,0.92), rgba(255,255,255,0.94));
-    border-color: #efdfac;
+  .reminder-card.done {
+    --status-color: #10b981;
+    --status-glow: rgba(16,185,129,0.14);
+    --status-line: rgba(16,185,129,0.24);
+    background: #ecfdf5;
+    border-color: #10b981;
+    opacity: 1;
   }
+  .reminder-card.done .reminder-text { color: #064e3b; }
+  .reminder-card.pending .reminder-text,
+  .reminder-card.overdue .reminder-text { color: #0f172a; }
   .reminder-text { color: #122034; font-size: 16px; font-weight: 850; line-height: 1.28; }
-  .reminder-time, .reminder-date, .cat-badge {
+  .reminder-time, .reminder-date, .cat-badge, .status-badge {
     min-height: 26px;
     display: inline-flex;
     align-items: center;
@@ -286,7 +299,23 @@
   }
   .reminder-time { color: var(--accent2); background: #dff3e7; padding: 0 10px; }
   .reminder-date { color: var(--text2); background: rgba(98,112,131,0.09); padding: 0 10px; }
-  .cat-badge { color: #596475; background: #f1f4f4; padding: 0 10px; }
+  .cat-badge {
+    color: var(--cat-color, #596475);
+    background: var(--cat-bg, #f1f4f4);
+    border: 1px solid var(--cat-border, transparent);
+    padding: 0 10px;
+  }
+  .status-badge { padding: 0 10px; }
+  .status-badge.pending {
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid rgba(245,158,11,0.24);
+  }
+  .status-badge.done {
+    color: #047857;
+    background: #d1fae5;
+    border: 1px solid rgba(16,185,129,0.24);
+  }
   .reminder-actions { gap: 7px; margin-top: 14px; flex-wrap: wrap; }
   .btn-action {
     min-height: 32px;
@@ -437,16 +466,29 @@
   .cat-chip {
     min-height: 42px;
     padding: 0 15px;
-    color: var(--text2);
-    background: rgba(255,255,255,0.9);
-    border: 1px solid var(--border);
+    color: var(--cat-color, var(--text2));
+    background: var(--cat-bg, rgba(255,255,255,0.9));
+    border: 1px solid var(--cat-border, var(--border));
     border-radius: 999px;
     font-size: 13px;
     font-weight: 850;
     box-shadow: 0 10px 30px rgba(32,55,70,0.08);
   }
-  .cat-chip.active { color: #fff; background: var(--accent); border-color: var(--accent); }
-  .cat-count { background: rgba(255,255,255,0.26); border-radius: 999px; font-weight: 900; }
+  .cat-chip::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cat-color, var(--accent));
+    box-shadow: 0 0 0 5px var(--cat-soft, rgba(8,148,83,0.10));
+  }
+  .cat-chip.active { color: #fff; background: var(--cat-color, var(--accent)); border-color: var(--cat-color, var(--accent)); }
+  .cat-count {
+    color: inherit;
+    background: rgba(255,255,255,0.42);
+    border-radius: 999px;
+    font-weight: 900;
+  }
   .category-panel,
   .alarm-card {
     background: rgba(255,255,255,0.92);
@@ -488,13 +530,14 @@
     align-items: center;
     gap: 8px;
     padding: 10px 10px 10px 14px;
-    background: #f7faf8;
-    border: 1px solid var(--border);
+    background: var(--cat-bg, #f7faf8);
+    border: 1px solid var(--cat-border, var(--border));
+    border-left: 5px solid var(--cat-color, var(--accent));
     border-radius: 18px;
   }
   .category-name {
     min-width: 0;
-    color: var(--text);
+    color: #0f172a;
     font-size: 14px;
     font-weight: 850;
     overflow: hidden;
@@ -757,6 +800,14 @@ const categoryIcons = {
   'Familia': '👨‍👩‍👧',
   'Otro': '📌'
 };
+const categoryVisuals = {
+  personal: { icon: '\uD83D\uDC64', color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe', soft: 'rgba(37,99,235,0.12)' },
+  otro: { icon: '\uD83D\uDCCC', color: '#64748b', bg: '#f8fafc', border: '#cbd5e1', soft: 'rgba(100,116,139,0.12)' },
+  facultad: { icon: '\uD83C\uDF93', color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe', soft: 'rgba(124,58,237,0.12)' },
+  masajes: { icon: '\uD83D\uDC86', color: '#059669', bg: '#ecfdf5', border: '#a7f3d0', soft: 'rgba(5,150,105,0.12)' },
+  practicas: { icon: '\uD83E\uDE7A', color: '#c2410c', bg: '#fff7ed', border: '#fed7aa', soft: 'rgba(194,65,12,0.12)' },
+  '(sin categoria)': { icon: '\uD83D\uDCC2', color: '#64748b', bg: '#f8fafc', border: '#cbd5e1', soft: 'rgba(100,116,139,0.12)' }
+};
 let categories = loadCategories();
 
 const firebaseConfig = {
@@ -977,6 +1028,14 @@ function renderCard(r) {
   const overdue = r.status === 'pending' && isPast(r);
   const cls = overdue ? 'overdue' : r.status;
   const statusIcon = r.status === 'done' ? '✅' : r.status === 'cancelled' ? '🚫' : overdue ? '⚠️' : '';
+  const statusBadge = r.status === 'done'
+    ? '<span class="status-badge done">Hecho</span>'
+    : r.status === 'pending'
+      ? '<span class="status-badge pending">Pendiente</span>'
+      : '';
+  const categoryBadge = r.category
+    ? `<span class="cat-badge" style="${getCategoryStyleAttr(r.category)}">${formatCategoryLabel(r.category)}</span>`
+    : '';
 
   const actions = r.status === 'pending'
     ? `<button class="btn-action btn-done" onclick="markDone('${r.id}')">✓ Hecho</button>
@@ -993,7 +1052,8 @@ function renderCard(r) {
     <div class="reminder-meta">
       ${r.time ? `<span class="reminder-time">🕐 ${r.time}</span>` : ''}
       ${r.date ? `<span class="reminder-date">${friendlyDate(r.date)}</span>` : ''}
-      ${r.category ? `<span class="cat-badge">${r.category}</span>` : ''}
+      ${categoryBadge}
+      ${statusBadge}
     </div>
     <div class="reminder-actions">${actions}</div>
   </div>`;
@@ -1015,8 +1075,8 @@ function renderCategories(c, q) {
         <button onclick="addCategory()">+</button>
       </div>
       <div class="category-list">
-        ${categories.map(name => `<div class="category-row">
-          <span class="category-name">${getCategoryIcon(name)} ${escHtml(name)}</span>
+        ${categories.map(name => `<div class="category-row" style="${getCategoryStyleAttr(name)}">
+          <span class="category-name">${formatCategoryLabel(name)}</span>
           <button class="category-action" onclick="renameCategory(${jsArg(name)})">✎</button>
           <button class="category-action delete" onclick="deleteCategoryName(${jsArg(name)})">×</button>
         </div>`).join('')}
@@ -1032,10 +1092,9 @@ function renderCategories(c, q) {
   }
 
   entries.sort((a,b) => b[1].pending - a[1].pending).forEach(([name, info]) => {
-    const icon = name === '(Sin categoría)' ? '📂' : getCategoryIcon(name);
     const isActive = activeCatFilter === name;
-    html += `<div class="cat-chip ${isActive ? 'active' : ''}" onclick="filterByCategory(${jsArg(name)})">
-      ${icon} ${escHtml(name)} <span class="cat-count">${info.pending}/${info.total}</span>
+    html += `<div class="cat-chip ${isActive ? 'active' : ''}" style="${getCategoryStyleAttr(name)}" onclick="filterByCategory(${jsArg(name)})">
+      ${formatCategoryLabel(name)} <span class="cat-count">${info.pending}/${info.total}</span>
     </div>`;
   });
   html += '</div>';
@@ -1045,7 +1104,7 @@ function renderCategories(c, q) {
       (r.category || '(Sin categoría)') === activeCatFilter &&
       (q ? r.text.toLowerCase().includes(q) : true)
     );
-    html += `<div class="section-title" style="margin-top:20px">${escHtml(activeCatFilter)}</div>`;
+    html += `<div class="section-title" style="margin-top:20px">${formatCategoryLabel(activeCatFilter)}</div>`;
     if (filtered.length === 0) {
       html += '<p style="color:var(--text3);font-size:13px;padding:12px 0">No hay recordatorios en esta categoría.</p>';
     } else {
@@ -1093,8 +1152,32 @@ function loadCategories() {
   const fromReminders = reminders.map(r => r.category).filter(Boolean);
   return [...new Set([...stored, ...fromReminders])].filter(Boolean);
 }
+function normalizeCategoryName(name) {
+  return (name || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+function getCategoryVisual(name) {
+  const key = normalizeCategoryName(name || '(Sin categoría)');
+  return categoryVisuals[key] || {
+    icon: categoryIcons[name] || '🏷️',
+    color: '#089453',
+    bg: '#f2faf5',
+    border: 'rgba(8,148,83,0.20)',
+    soft: 'rgba(8,148,83,0.10)'
+  };
+}
 function getCategoryIcon(name) {
-  return categoryIcons[name] || '🏷️';
+  return getCategoryVisual(name).icon || categoryIcons[name] || '🏷️';
+}
+function formatCategoryLabel(name) {
+  return `${getCategoryIcon(name)} ${escHtml(name)}`;
+}
+function getCategoryStyleAttr(name) {
+  const visual = getCategoryVisual(name);
+  return `--cat-color:${visual.color};--cat-bg:${visual.bg};--cat-border:${visual.border};--cat-soft:${visual.soft};`;
 }
 function renderCategoryOptions(selected) {
   const select = document.getElementById('reminderCat');
