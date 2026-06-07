@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#f8fbfa" />
+<title>Agenda semanal - Recordatorios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}html{background:#d7dde2;min-height:100%}body{min-height:100dvh;max-width:430px;margin:0 auto;overflow-x:hidden;position:relative;background:radial-gradient(circle at 88% 14%,rgba(8,148,83,.06),transparent 26%),radial-gradient(circle at 16% 78%,rgba(8,148,83,.05),transparent 22%),#f8fbfa;color:#0c2631;font-family:"Inter","SF Pro Display","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 0 0 1px rgba(0,0,0,.03),0 30px 90px rgba(11,28,40,.18)}body:before{content:"";position:fixed;inset:0;max-width:430px;margin:0 auto;pointer-events:none;opacity:.32;background-image:radial-gradient(circle at 20px 20px,rgba(8,148,83,.1) 0 1px,transparent 1.5px),radial-gradient(circle at 72px 52px,rgba(12,38,49,.07) 0 1px,transparent 1.5px);background-size:86px 86px,118px 118px;mask-image:linear-gradient(to bottom,transparent 0,#000 190px,#000 calc(100% - 220px),transparent 100%)}button,input{font:inherit}button{cursor:pointer;border:0;background:none;color:inherit}.header{position:sticky;top:0;z-index:50;padding:42px 28px 16px;background:linear-gradient(180deg,rgba(248,251,250,.98) 0%,rgba(248,251,250,.9) 74%,rgba(248,251,250,0) 100%);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}.header-top{display:grid;grid-template-columns:1fr auto auto;align-items:start;gap:14px;margin-bottom:18px}.logo{font-size:38px;font-weight:900;line-height:.98;letter-spacing:0;color:#0c2631}.logo:after{content:attr(data-count) " pendientes";display:block;margin-top:10px;color:#089453;font-size:16px;font-weight:800;line-height:1.2}.header-icon{width:42px;height:42px;display:grid;place-items:center;color:#0d1e2e;font-size:32px;line-height:1}.search-wrap{position:relative}.search-wrap input{width:100%;min-height:52px;outline:none;background:rgba(255,255,255,.88);border:1px solid #e0e8e4;border-radius:999px;padding:0 52px 0 20px;color:#0c2631;font-size:15px;font-weight:650;box-shadow:0 10px 30px rgba(32,55,70,.08)}.search-wrap input::placeholder{color:#8a95a6;font-weight:650}.search-icon{position:absolute;right:18px;top:50%;transform:translateY(-50%);color:#627083;font-size:18px}.content{position:relative;z-index:1;padding:0 18px 116px}.quick-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:2px 0 14px}.filter-card{min-height:66px;padding:10px 8px;background:rgba(255,255,255,.88);border:1px solid #e0e8e4;border-radius:20px;box-shadow:0 10px 30px rgba(32,55,70,.08);text-align:left}.filter-card.active{border-color:#2f5be7;box-shadow:0 12px 34px rgba(47,91,231,.18)}.filter-line{width:7px;height:24px;border-radius:8px;margin-bottom:5px}.filter-num{font-size:22px;font-weight:900;line-height:1}.filter-label{font-size:10px;font-weight:850;color:#627083;line-height:1.1}.week-panel{background:rgba(255,255,255,.74);border:1px solid #e0e8e4;border-radius:28px;box-shadow:0 18px 44px rgba(32,55,70,.12);overflow:hidden}.week-nav{display:grid;grid-template-columns:46px 78px 46px 1fr;gap:8px;align-items:center;padding:14px 12px 12px;background:rgba(255,255,255,.78);border-bottom:1px solid #e7eee9}.nav-btn,.today-btn{height:42px;border-radius:999px;background:rgba(255,255,255,.92);border:1px solid #dfe7e4;box-shadow:0 8px 22px rgba(32,55,70,.08);font-weight:900;color:#2f5be7}.nav-btn{font-size:24px}.range{text-align:right;font-weight:900;font-size:15px;color:#121b2b;line-height:1.2}.calendar-scroll{overflow:auto;max-height:calc(100dvh - 330px);background:#fbfdfc}.calendar{min-width:840px;display:grid;grid-template-columns:64px repeat(7,1fr);position:relative}.corner,.day-head{position:sticky;top:0;z-index:3;background:rgba(251,253,252,.96);border-bottom:1px solid #e0e8e4}.corner{left:0;z-index:4;border-right:1px solid #e0e8e4}.day-head{height:74px;display:grid;place-items:center;text-align:center;border-right:1px solid #e0e8e4}.day-num{font-size:26px;font-weight:900;color:#101827;line-height:1}.day-name{margin-top:3px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:850;color:#98a1b1}.day-head.today .day-num{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;margin:auto;background:#2f5be7;color:white}.time-cell{height:138px;position:sticky;left:0;z-index:2;background:rgba(251,253,252,.96);border-right:1px solid #e0e8e4;border-bottom:1px solid #e8efeb;color:#9ba4b4;font-size:13px;font-weight:850;padding:10px 8px}.slot{height:138px;position:relative;border-right:1px solid #e0e8e4;border-bottom:1px solid #e8efeb;background:rgba(255,255,255,.46);padding:6px}.slot:active{background:#f3faf6}.event{position:relative;border-radius:15px;padding:9px 9px 8px;margin-bottom:6px;min-height:112px;box-shadow:0 8px 22px rgba(32,55,70,.08);overflow:hidden}.event-title{font-size:13px;font-weight:900;line-height:1.16;color:#111827;margin-bottom:7px}.event-meta{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}.pill{display:inline-flex;align-items:center;gap:3px;min-height:22px;padding:0 7px;border-radius:999px;font-size:10px;font-weight:900;line-height:1}.event-actions{display:flex;gap:5px;align-items:center;position:absolute;left:8px;right:8px;bottom:7px}.event-actions button{height:24px;border-radius:999px;font-size:10px;font-weight:900;padding:0 8px}.more-btn{position:absolute;right:8px;top:8px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.62);font-size:14px;font-weight:900}.pending{background:#fff8e8;border:2px solid #f4b02a}.pending .status{color:#8a5d00;background:#fff0bf}.pending .done-btn{background:#dff3e7;color:#006f4e}.pending .cancel-btn{background:#fde7e5;color:#b94b44}.done{background:#ecfdf5;border:2px solid #10b981}.done .event-title{color:#064e3b}.done .status{color:#047857;background:#d1fae5}.done .done-btn{background:#d1fae5;color:#047857}.done .cancel-btn{display:none}.overdue{background:#fff1f1;border:2px solid #d95d55}.overdue .status{color:#a31313;background:#fde1df}.overdue .done-btn{background:#dff3e7;color:#006f4e}.overdue .cancel-btn{background:#fde1df;color:#a31313}.cat{color:#059669;background:#e9fbf4;border:1px solid #a7f3d0}.time{color:#006f4e;background:#dff3e7}.edit-btn,.menu-mini{background:#eef2f2;color:#627083}.overflow{min-height:34px;border-radius:14px;border:1px dashed #cbd5e1;background:#f8fafc;color:#627083;display:grid;place-items:center;font-size:12px;font-weight:900}.bottom-nav{position:fixed;z-index:90;left:50%;bottom:0;transform:translateX(-50%);width:min(430px,100%);height:96px;padding:10px 10px 12px;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:rgba(235,242,249,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 -16px 34px rgba(20,40,58,.12)}.nav-item{display:grid;place-items:center;color:#8aa0b8;font-size:11px;font-weight:850;text-align:center}.nav-ico{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.48);font-size:23px;box-shadow:0 10px 22px rgba(32,55,70,.08)}.nav-item.active{color:#2f5be7}.nav-item.active .nav-ico{background:#eef5ff;box-shadow:0 12px 28px rgba(47,91,231,.18)}.fab{position:fixed;right:calc(50% - 190px);bottom:112px;z-index:100;width:76px;height:76px;border-radius:50%;display:grid;place-items:center;color:white;background:radial-gradient(circle at 35% 25%,#15b66c,#008651 58%,#006f4e 100%);box-shadow:0 22px 42px rgba(0,135,80,.36);font-size:54px;font-weight:300}.legend{display:flex;gap:8px;overflow:auto;padding:0 0 14px}.legend-chip{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.9);border:1px solid #e0e8e4;box-shadow:0 8px 20px rgba(32,55,70,.08);font-size:12px;font-weight:850;color:#627083}.dot{width:9px;height:9px;border-radius:50%}@media(max-width:390px){.header{padding-left:22px;padding-right:22px}.logo{font-size:34px}.content{padding-left:14px;padding-right:14px}.fab{right:24px;width:70px;height:70px}.calendar-scroll{max-height:calc(100dvh - 318px)}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <span class="logo" id="logo" data-count="12">Agenda</span>
+    <button class="header-icon" aria-label="Buscar">⌕</button>
+    <button class="header-icon" aria-label="Menú">⋮</button>
+  </div>
+  <div class="search-wrap">
+    <input id="searchInput" placeholder="Buscar recordatorios" oninput="renderCalendar()" />
+    <span class="search-icon">⌕</span>
+  </div>
+</div>
+<main class="content">
+  <section class="quick-stats" id="filters"></section>
+  <div class="legend">
+    <span class="legend-chip"><span class="dot" style="background:#f4b02a"></span>Pendiente</span>
+    <span class="legend-chip"><span class="dot" style="background:#10b981"></span>Completado</span>
+    <span class="legend-chip"><span class="dot" style="background:#d95d55"></span>Vencido</span>
+    <span class="legend-chip"><span class="dot" style="background:#2f5be7"></span>Seleccionado</span>
+  </div>
+  <section class="week-panel">
+    <div class="week-nav">
+      <button class="nav-btn" onclick="shiftWeek(-7)">‹</button>
+      <button class="today-btn" onclick="goToday()">Hoy</button>
+      <button class="nav-btn" onclick="shiftWeek(7)">›</button>
+      <div class="range" id="weekRange"></div>
+    </div>
+    <div class="calendar-scroll">
+      <div class="calendar" id="calendar"></div>
+    </div>
+  </section>
+</main>
+<button class="fab" onclick="addDemoReminder()">+</button>
+<nav class="bottom-nav">
+  <button class="nav-item active"><span class="nav-ico">▣</span><span>Agenda</span></button>
+  <button class="nav-item"><span class="nav-ico">▥</span><span>Consultorios</span></button>
+  <button class="nav-item"><span class="nav-ico">▤</span><span>Mis turnos</span></button>
+  <button class="nav-item"><span class="nav-ico">☆</span><span>Métricas</span></button>
+  <button class="nav-item"><span class="nav-ico">◉</span><span>Panel</span></button>
+  <button class="nav-item"><span class="nav-ico">⌔</span><span>Bloqueos</span></button>
+  <button class="nav-item"><span class="nav-ico">⊗</span><span>Salir</span></button>
+</nav>
+<script>
+const hours = Array.from({length:13},(_,i)=>String(i+8).padStart(2,'0')+':00');
+const dayNames = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+let activeFilter = 'all';
+let weekStart = mondayOf(new Date('2026-06-08T09:00:00'));
+let reminders = [
+  {id:'r1',title:'Avisar turnos a Fernanda',date:'2026-06-08',time:'15:00',cat:'🐱 Masajes',status:'pending'},
+  {id:'r2',title:'Confirmar agenda de Milagros',date:'2026-06-09',time:'09:00',cat:'💆 Masajes',status:'done'},
+  {id:'r3',title:'Revisar pagos pendientes',date:'2026-06-10',time:'08:00',cat:'💰 Finanzas',status:'overdue'},
+  {id:'r4',title:'Enviar recordatorio a Ernesto',date:'2026-06-10',time:'11:00',cat:'📌 Personal',status:'pending'},
+  {id:'r5',title:'Preparar sala C3',date:'2026-06-11',time:'15:00',cat:'🏥 Consultorio',status:'done'},
+  {id:'r6',title:'Cancelar turno duplicado',date:'2026-06-11',time:'15:00',cat:'⚠️ Turnos',status:'overdue'},
+  {id:'r7',title:'Llamar a Yami',date:'2026-06-11',time:'15:00',cat:'📞 Personal',status:'pending'},
+  {id:'r8',title:'Actualizar horarios del sábado',date:'2026-06-13',time:'10:00',cat:'📅 Agenda',status:'pending'},
+  {id:'r9',title:'Cierre semanal',date:'2026-06-14',time:'19:00',cat:'📊 Panel',status:'pending'}
+];
+function mondayOf(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x}
+function iso(d){return d.toISOString().slice(0,10)}
+function dateAdd(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function fmt(d){return d.toLocaleDateString('es-AR',{day:'numeric',month:'short'}).replace('.','')}
+function filterList(){const q=document.getElementById('searchInput').value.toLowerCase().trim();return reminders.filter(r=>{if(q&&!(`${r.title} ${r.cat} ${r.status}`.toLowerCase().includes(q)))return false;if(activeFilter==='all')return true;return r.status===activeFilter})}
+function renderFilters(){const counts={all:reminders.length,pending:reminders.filter(r=>r.status==='pending').length,done:reminders.filter(r=>r.status==='done').length,overdue:reminders.filter(r=>r.status==='overdue').length};document.getElementById('logo').dataset.count=counts.pending;const data=[['all','Todos','#2f5be7'],['pending','Pendientes','#f4b02a'],['done','Completados','#10b981'],['overdue','Vencidos','#d95d55']];document.getElementById('filters').innerHTML=data.map(([key,label,color])=>`<button class="filter-card ${activeFilter===key?'active':''}" onclick="activeFilter='${key}';renderCalendar()"><div class="filter-line" style="background:${color}"></div><div class="filter-num" style="color:${color}">${counts[key]}</div><div class="filter-label">${label}</div></button>`).join('')}
+function renderCalendar(){renderFilters();const end=dateAdd(weekStart,6);document.getElementById('weekRange').textContent=`${fmt(weekStart)} – ${fmt(end)} 2026`;const days=Array.from({length:7},(_,i)=>dateAdd(weekStart,i));let html='<div class="corner"></div>';days.forEach((d,i)=>{html+=`<div class="day-head ${iso(d)==='2026-06-08'?'today':''}"><div><div class="day-num">${d.getDate()}</div><div class="day-name">${dayNames[i]}</div></div></div>`});const list=filterList();hours.forEach(h=>{html+=`<div class="time-cell">${h}</div>`;days.forEach(d=>{const items=list.filter(r=>r.date===iso(d)&&r.time===h);html+=`<div class="slot" onclick="quickCreate('${iso(d)}','${h}')">${renderEvents(items)}</div>`})});document.getElementById('calendar').innerHTML=html}
+function renderEvents(items){if(!items.length)return '';const visible=items.slice(0,2).map(renderEvent).join('');const extra=items.length>2?`<div class="overflow">+${items.length-2} más</div>`:'';return visible+extra}
+function renderEvent(r){const label=r.status==='done'?'✓ Hecho':r.status==='overdue'?'⚠ Vencido':'Pendiente';return `<article class="event ${r.status}" onclick="event.stopPropagation()"><button class="more-btn">⋮</button><div class="event-title">${r.status==='overdue'?'⚠ ':r.status==='done'?'✓ ':''}${r.title}</div><div class="event-meta"><span class="pill time">🕒 ${r.time}</span><span class="pill cat">${r.cat}</span><span class="pill status">${label}</span></div><div class="event-actions"><button class="done-btn" onclick="mark('${r.id}','done')">✓ Hecho</button><button class="cancel-btn" onclick="mark('${r.id}','overdue')">✕ Cancelar</button><button class="edit-btn">✎</button><button class="menu-mini">⋯</button></div></article>`}
+function mark(id,status){const r=reminders.find(x=>x.id===id);if(r){r.status=status;renderCalendar()}}
+function shiftWeek(n){weekStart=dateAdd(weekStart,n);renderCalendar()}
+function goToday(){weekStart=mondayOf(new Date('2026-06-08T09:00:00'));renderCalendar()}
+function quickCreate(date,time){reminders.push({id:Date.now().toString(36),title:'Nuevo recordatorio',date,time,cat:'📌 Personal',status:'pending'});renderCalendar()}
+function addDemoReminder(){reminders.push({id:Date.now().toString(36),title:'Recordatorio rápido',date:'2026-06-12',time:'16:00',cat:'📌 Personal',status:'pending'});renderCalendar()}
+renderCalendar();
+</script>
+</body>
+</html>
