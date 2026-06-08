@@ -9,35 +9,65 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}html{background:#d7dde2;min-height:100%}body{min-height:100dvh;max-width:430px;margin:0 auto;overflow-x:hidden;position:relative;background:radial-gradient(circle at 88% 14%,rgba(8,148,83,.06),transparent 26%),radial-gradient(circle at 16% 78%,rgba(8,148,83,.05),transparent 22%),#f8fbfa;color:#0c2631;font-family:"Inter","SF Pro Display","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 0 0 1px rgba(0,0,0,.03),0 30px 90px rgba(11,28,40,.18)}body:before{content:"";position:fixed;inset:0;max-width:430px;margin:0 auto;pointer-events:none;opacity:.32;background-image:radial-gradient(circle at 20px 20px,rgba(8,148,83,.1) 0 1px,transparent 1.5px),radial-gradient(circle at 72px 52px,rgba(12,38,49,.07) 0 1px,transparent 1.5px);background-size:86px 86px,118px 118px;mask-image:linear-gradient(to bottom,transparent 0,#000 190px,#000 calc(100% - 220px),transparent 100%)}button,input{font:inherit}button{cursor:pointer;border:0;background:none;color:inherit}.header{position:sticky;top:0;z-index:50;padding:42px 28px 16px;background:linear-gradient(180deg,rgba(248,251,250,.98) 0%,rgba(248,251,250,.9) 74%,rgba(248,251,250,0) 100%);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}.header-top{display:grid;grid-template-columns:1fr auto auto;align-items:start;gap:14px;margin-bottom:18px}.logo{font-size:38px;font-weight:900;line-height:.98;letter-spacing:0;color:#0c2631}.logo:after{content:attr(data-count) " pendientes";display:block;margin-top:10px;color:#089453;font-size:16px;font-weight:800;line-height:1.2}.header-icon{width:42px;height:42px;display:grid;place-items:center;color:#0d1e2e;font-size:32px;line-height:1}.search-wrap{position:relative}.search-wrap input{width:100%;min-height:52px;outline:none;background:rgba(255,255,255,.88);border:1px solid #e0e8e4;border-radius:999px;padding:0 52px 0 20px;color:#0c2631;font-size:15px;font-weight:650;box-shadow:0 10px 30px rgba(32,55,70,.08)}.search-wrap input::placeholder{color:#8a95a6;font-weight:650}.search-icon{position:absolute;right:18px;top:50%;transform:translateY(-50%);color:#627083;font-size:18px}.content{position:relative;z-index:1;padding:0 18px 28px}.quick-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:2px 0 14px}.filter-card{min-height:66px;padding:10px 8px;background:rgba(255,255,255,.88);border:1px solid #e0e8e4;border-radius:20px;box-shadow:0 10px 30px rgba(32,55,70,.08);text-align:left}.filter-card.active{border-color:#2f5be7;box-shadow:0 12px 34px rgba(47,91,231,.18)}.filter-line{width:7px;height:24px;border-radius:8px;margin-bottom:5px}.filter-num{font-size:22px;font-weight:900;line-height:1}.filter-label{font-size:10px;font-weight:850;color:#627083;line-height:1.1}.week-panel{background:rgba(255,255,255,.74);border:1px solid #e0e8e4;border-radius:28px;box-shadow:0 18px 44px rgba(32,55,70,.12);overflow:hidden;height:calc(100dvh - 238px);min-height:520px;display:flex;flex-direction:column}.week-nav{display:grid;grid-template-columns:46px 78px 46px 1fr;gap:8px;align-items:center;padding:14px 12px 12px;background:rgba(255,255,255,.92);border-bottom:1px solid #e7eee9;flex:0 0 auto;position:sticky;top:0;z-index:8}.nav-btn,.today-btn{height:42px;border-radius:999px;background:rgba(255,255,255,.92);border:1px solid #dfe7e4;box-shadow:0 8px 22px rgba(32,55,70,.08);font-weight:900;color:#2f5be7}.nav-btn{font-size:24px}.range{text-align:right;font-weight:900;font-size:15px;color:#121b2b;line-height:1.2}.calendar-scroll{overflow:auto;background:#fbfdfc;flex:1 1 auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}.calendar-scroll::-webkit-scrollbar{display:none}.calendar{min-width:760px;display:grid;grid-template-columns:56px repeat(7,minmax(100px,1fr));position:relative}.corner,.day-head{position:sticky;top:0;z-index:3;background:rgba(251,253,252,.96);border-bottom:1px solid #e0e8e4}.corner{left:0;z-index:4;border-right:1px solid #e0e8e4}.day-head{height:70px;display:grid;place-items:center;text-align:center;border-right:1px solid #e0e8e4}.day-num{font-size:26px;font-weight:900;color:#101827;line-height:1}.day-name{margin-top:3px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:850;color:#98a1b1}.day-head.today .day-num{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;margin:auto;background:#2f5be7;color:white}.time-cell{height:112px;position:sticky;left:0;z-index:2;background:rgba(251,253,252,.96);border-right:1px solid #e0e8e4;border-bottom:1px solid #e8efeb;color:#9ba4b4;font-size:13px;font-weight:850;padding:10px 8px}.slot{height:112px;position:relative;border-right:1px solid #e0e8e4;border-bottom:1px solid #e8efeb;background:rgba(255,255,255,.46);padding:5px}.slot:active{background:#f3faf6}.event{position:relative;border-radius:14px;padding:8px 8px 34px;margin-bottom:5px;min-height:96px;box-shadow:0 8px 22px rgba(32,55,70,.08);overflow:hidden}.event-title{font-size:12px;font-weight:900;line-height:1.12;color:#111827;margin-bottom:6px;padding-right:22px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.event-meta{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}.pill{display:inline-flex;align-items:center;gap:3px;min-height:20px;padding:0 6px;border-radius:999px;font-size:9.5px;font-weight:900;line-height:1;max-width:100%;white-space:nowrap}.event-actions{display:flex;gap:4px;align-items:center;position:absolute;left:7px;right:7px;bottom:7px}.event-actions button{height:22px;border-radius:999px;font-size:9.5px;font-weight:900;padding:0 7px;min-width:0}.event-actions .done-btn,.event-actions .cancel-btn{flex:1}.event-actions .edit-btn,.event-actions .menu-mini{width:24px;padding:0;flex:0 0 24px}.more-btn{position:absolute;right:7px;top:7px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.72);font-size:14px;font-weight:900;z-index:2}.pending{background:#fff8e8;border:2px solid #f4b02a}.pending .status{color:#8a5d00;background:#fff0bf}.pending .done-btn{background:#dff3e7;color:#006f4e}.pending .cancel-btn{background:#fde7e5;color:#b94b44}.done{background:#ecfdf5;border:2px solid #10b981}.done .event-title{color:#064e3b}.done .status{color:#047857;background:#d1fae5}.done .done-btn{background:#d1fae5;color:#047857}.done .cancel-btn{display:none}.overdue{background:#fff1f1;border:2px solid #d95d55}.overdue .status{color:#a31313;background:#fde1df}.overdue .done-btn{background:#dff3e7;color:#006f4e}.overdue .cancel-btn{background:#fde1df;color:#a31313}.cat{color:#059669;background:#e9fbf4;border:1px solid #a7f3d0}.time{color:#006f4e;background:#dff3e7}.edit-btn,.menu-mini{background:#eef2f2;color:#627083}.overflow{min-height:34px;border-radius:14px;border:1px dashed #cbd5e1;background:#f8fafc;color:#627083;display:grid;place-items:center;font-size:12px;font-weight:900}.bottom-nav{display:none!important}.nav-item,.nav-ico{display:none!important}.fab{position:fixed;right:calc(50% - 190px);bottom:24px;z-index:100;width:76px;height:76px;border-radius:50%;display:grid;place-items:center;color:white;background:radial-gradient(circle at 35% 25%,#15b66c,#008651 58%,#006f4e 100%);box-shadow:0 22px 42px rgba(0,135,80,.36);font-size:54px;font-weight:300}.legend{display:flex;gap:8px;overflow:auto;padding:0 0 14px}.legend-chip{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.9);border:1px solid #e0e8e4;box-shadow:0 8px 20px rgba(32,55,70,.08);font-size:12px;font-weight:850;color:#627083}.dot{width:9px;height:9px;border-radius:50%}@media(max-width:390px){.header{padding-left:22px;padding-right:22px}.logo{font-size:34px}.content{padding-left:14px;padding-right:14px}.week-panel{height:calc(100dvh - 226px);min-height:500px}.calendar{min-width:720px;grid-template-columns:54px repeat(7,minmax(95px,1fr))}.fab{right:24px;bottom:24px;width:70px;height:70px}}
-/* Ajuste mobile: planilla fija, tarjetas proporcionadas y sin barra inferior de la app */
-html{height:100%;overflow:hidden;background:#f8fbfa}
-body{height:100dvh;min-height:0;overflow:hidden;display:flex;flex-direction:column;box-shadow:none}
+/* Ajuste mobile: cabecera normal, grilla semanal con scroll interno y eventos por categoria */
+html{height:auto;overflow-x:hidden;background:#f8fbfa}
+body{min-height:100dvh;height:auto;overflow-x:hidden;overflow-y:auto;display:block;box-shadow:none}
 body:before{inset:0 0 auto;height:100dvh}
-.header{position:relative;flex:0 0 auto;padding:38px 28px 14px}
-.content{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 18px 0}
+.header{position:relative;top:auto;z-index:2;padding:38px 28px 14px;background:linear-gradient(180deg,rgba(248,251,250,.98),rgba(248,251,250,.86) 74%,rgba(248,251,250,0))}
+.content{position:relative;z-index:1;display:block;padding:0 18px 22px}
 .quick-stats{margin:0 0 10px}
 .legend,.bottom-nav,.nav-item,.nav-ico{display:none!important}
-.week-panel{flex:1 1 auto;height:auto;min-height:0;border-radius:26px 26px 0 0;box-shadow:0 14px 34px rgba(32,55,70,.1)}
-.week-nav{grid-template-columns:44px 76px 44px minmax(116px,1fr);gap:8px;padding:12px 12px 10px}
+.week-panel{height:calc(100dvh - 236px);min-height:440px;max-height:620px;border-radius:26px;box-shadow:0 14px 34px rgba(32,55,70,.1);display:flex;flex-direction:column}
+.week-nav{position:relative;top:auto;grid-template-columns:44px 76px 44px minmax(116px,1fr);gap:8px;padding:12px 12px 10px;z-index:7}
 .range{font-size:14px}
-.calendar-scroll{min-height:0;height:100%;overflow:auto;scroll-padding-top:66px;scrollbar-width:none;touch-action:pan-x pan-y}
-.calendar{min-width:700px;grid-template-columns:52px repeat(7,minmax(92px,1fr))}
+.calendar-scroll{flex:1 1 auto;min-height:0;height:auto;overflow:auto;scroll-padding-top:66px;scrollbar-width:none;touch-action:pan-x pan-y}
+.calendar{min-width:760px;grid-template-columns:52px repeat(7,minmax(100px,1fr))}
 .day-head{height:64px}
 .day-num{font-size:24px}
 .day-head.today .day-num{width:40px;height:40px}
-.time-cell,.slot{height:126px}
-.time-cell{font-size:13px;padding:9px 7px}
-.slot{padding:6px}
-.event{min-height:112px;height:112px;border-width:1.5px;border-radius:16px;padding:8px 7px 30px;box-shadow:0 8px 18px rgba(32,55,70,.07)}
-.event-title{font-size:11.5px;line-height:1.13;margin-bottom:6px;padding-right:20px;-webkit-line-clamp:2}
-.event-meta{gap:4px;margin-bottom:5px}
-.pill{min-height:18px;padding:0 5px;font-size:8.8px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.event-actions{left:6px;right:6px;bottom:6px;gap:3px}
-.event-actions button{height:20px;font-size:8.5px;padding:0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.event-actions .edit-btn,.event-actions .menu-mini{width:21px;flex-basis:21px}
-.more-btn{right:6px;top:6px;width:20px;height:20px;font-size:13px}
-.fab{right:max(18px,calc(50% - 188px));bottom:18px;width:70px;height:70px;font-size:50px}
-@media(max-width:390px){.header{padding:34px 22px 12px}.content{padding-left:12px;padding-right:12px}.week-panel{height:auto;min-height:0}.calendar{min-width:660px;grid-template-columns:50px repeat(7,minmax(87px,1fr))}.time-cell,.slot{height:122px}.event{min-height:108px;height:108px}.fab{right:18px;bottom:16px;width:66px;height:66px}}
+.time-cell,.slot{height:154px}
+.time-cell{font-size:13px;padding:10px 7px}
+.slot{padding:7px;overflow:visible}
+.event{--cat:#2f5be7;--cat-soft:#eef4ff;--cat-line:#b8c7ff;background:var(--cat-soft);border:1.5px solid var(--cat-line);border-left:5px solid var(--cat);min-height:76px;height:auto;border-radius:15px;padding:8px 7px 9px;box-shadow:0 8px 18px rgba(32,55,70,.07);transition:min-height .18s ease,box-shadow .18s ease,transform .18s ease}
+.event:active{transform:scale(.985)}
+.event.expanded{min-height:136px;box-shadow:0 14px 28px rgba(32,55,70,.14);z-index:6}
+.event-title{font-size:11.8px;line-height:1.18;margin-bottom:6px;padding-right:20px;-webkit-line-clamp:2}
+.event.expanded .event-title{-webkit-line-clamp:3}
+.event-meta{gap:4px;margin-bottom:0}
+.pill{min-height:18px;padding:0 6px;font-size:8.8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;background:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.48)}
+.cat{color:var(--cat);background:rgba(255,255,255,.72);border-color:var(--cat-line)}
+.event-desc{display:none;margin-top:7px;color:#425064;font-size:10px;font-weight:750;line-height:1.28}
+.event.expanded .event-desc{display:block}
+.event-actions{display:none;position:static;margin-top:8px;gap:4px}
+.event.expanded .event-actions{display:flex}
+.event-actions button{height:24px;font-size:8.8px;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.event-actions .edit-btn,.event-actions .menu-mini{width:24px;flex:0 0 24px}
+.more-btn{right:6px;top:6px;width:20px;height:20px;font-size:13px;color:var(--cat)}
+.overflow{min-height:26px;font-size:10px}
+.fab{right:max(18px,calc(50% - 188px));bottom:18px;width:68px;height:68px;font-size:48px}
+.batch-modal{position:fixed;inset:0;z-index:220;display:none;align-items:flex-end;justify-content:center;background:rgba(12,38,49,.36);padding:18px}
+.batch-modal.open{display:flex}
+.batch-sheet{width:min(100%,430px);max-height:86dvh;overflow:auto;background:#fbfdfc;border:1px solid #dce7e3;border-radius:26px 26px 18px 18px;box-shadow:0 24px 70px rgba(11,28,40,.28);padding:18px}
+.batch-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.batch-title{font-size:22px;font-weight:900;line-height:1.05;color:#0c2631}
+.batch-sub{margin-top:4px;color:#627083;font-size:12px;font-weight:750;line-height:1.3}
+.close-btn{width:38px;height:38px;border-radius:999px;background:#eef3f2;color:#334155;font-size:22px;font-weight:900}
+.batch-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.batch-field{display:flex;flex-direction:column;gap:6px}
+.batch-field.full{grid-column:1/-1}
+.batch-field label{font-size:11px;font-weight:900;color:#627083;text-transform:uppercase;letter-spacing:.04em}
+.batch-field input,.batch-field select,.batch-field textarea{width:100%;min-height:42px;border:1px solid #dce7e3;border-radius:14px;background:white;color:#0c2631;padding:10px 12px;font-size:14px;font-weight:750;outline:none}
+.batch-field textarea{min-height:72px;resize:none;line-height:1.35}
+.weekday-picker{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.weekday-picker label{display:grid;place-items:center;min-height:38px;border-radius:12px;border:1px solid #dce7e3;background:white;color:#627083;font-size:11px;font-weight:900}
+.weekday-picker input{display:none}
+.weekday-picker label:has(input:checked){background:#e9fbf5;border-color:#10a37f;color:#047857;box-shadow:0 8px 18px rgba(16,163,127,.14)}
+.batch-actions{display:flex;gap:10px;margin-top:14px}
+.batch-actions button{height:46px;border-radius:999px;font-weight:900}
+.ghost-btn{flex:0 0 112px;background:#eef3f2;color:#475569}
+.save-batch-btn{flex:1;background:#089453;color:white;box-shadow:0 12px 26px rgba(8,148,83,.24)}
+.batch-feedback{min-height:18px;margin-top:10px;color:#047857;font-size:12px;font-weight:850}
+@media(max-width:390px){.header{padding:34px 22px 12px}.content{padding-left:12px;padding-right:12px}.week-panel{height:calc(100dvh - 222px);min-height:420px}.calendar{min-width:720px;grid-template-columns:50px repeat(7,minmax(95px,1fr))}.time-cell,.slot{height:150px}.event{min-height:74px}.event.expanded{min-height:132px}.fab{right:18px;bottom:16px;width:64px;height:64px}.batch-modal{padding:10px}.batch-sheet{padding:16px}.batch-grid{gap:9px}.weekday-picker{gap:4px}}
 </style>
 </head>
 <body>
@@ -72,12 +102,75 @@ body:before{inset:0 0 auto;height:100dvh}
     </div>
   </section>
 </main>
-<button class="fab" onclick="addDemoReminder()">+</button>
+<button class="fab" onclick="openBatchModal()">+</button>
+<div class="batch-modal" id="batchModal" aria-hidden="true">
+  <section class="batch-sheet">
+    <div class="batch-head">
+      <div>
+        <h2 class="batch-title">Agregar por tandas</h2>
+        <p class="batch-sub">Crea varios recordatorios repitiendo dias y horario dentro de un rango.</p>
+      </div>
+      <button class="close-btn" onclick="closeBatchModal()" aria-label="Cerrar">x</button>
+    </div>
+    <div class="batch-grid">
+      <div class="batch-field full">
+        <label for="batchTitle">Titulo</label>
+        <input id="batchTitle" value="Practica" />
+      </div>
+      <div class="batch-field">
+        <label for="batchCategory">Categoria</label>
+        <select id="batchCategory">
+          <option>Agenda</option>
+          <option>Personal</option>
+          <option>Masajes</option>
+          <option>Finanzas</option>
+          <option>Consultorio</option>
+          <option>Turnos</option>
+          <option>Panel</option>
+        </select>
+      </div>
+      <div class="batch-field">
+        <label for="batchTime">Hora</label>
+        <input id="batchTime" type="time" value="09:00" />
+      </div>
+      <div class="batch-field">
+        <label for="batchStart">Desde</label>
+        <input id="batchStart" type="date" value="2026-06-08" />
+      </div>
+      <div class="batch-field">
+        <label for="batchEnd">Hasta</label>
+        <input id="batchEnd" type="date" value="2026-07-08" />
+      </div>
+      <div class="batch-field full">
+        <label>Dias</label>
+        <div class="weekday-picker">
+          <label><input type="checkbox" name="batchDay" value="1" checked />L</label>
+          <label><input type="checkbox" name="batchDay" value="2" />M</label>
+          <label><input type="checkbox" name="batchDay" value="3" checked />X</label>
+          <label><input type="checkbox" name="batchDay" value="4" />J</label>
+          <label><input type="checkbox" name="batchDay" value="5" checked />V</label>
+          <label><input type="checkbox" name="batchDay" value="6" />S</label>
+          <label><input type="checkbox" name="batchDay" value="0" />D</label>
+        </div>
+      </div>
+      <div class="batch-field full">
+        <label for="batchDesc">Descripcion</label>
+        <textarea id="batchDesc">Practica recurrente cargada por tandas.</textarea>
+      </div>
+    </div>
+    <div class="batch-actions">
+      <button class="ghost-btn" onclick="closeBatchModal()">Cancelar</button>
+      <button class="save-batch-btn" onclick="createBatchReminders()">Crear tanda</button>
+    </div>
+    <div class="batch-feedback" id="batchFeedback"></div>
+  </section>
+</div>
 
 <script>
 const hours = Array.from({length:13},(_,i)=>String(i+8).padStart(2,'0')+':00');
 const dayNames = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 let activeFilter = 'all';
+let expandedId = null;
 let weekStart = mondayOf(new Date('2026-06-08T09:00:00'));
 let reminders = [
   {id:'r1',title:'Avisar turnos a Fernanda',date:'2026-06-08',time:'15:00',cat:'🐱 Masajes',status:'pending'},
@@ -90,6 +183,18 @@ let reminders = [
   {id:'r8',title:'Actualizar horarios del sábado',date:'2026-06-13',time:'10:00',cat:'📅 Agenda',status:'pending'},
   {id:'r9',title:'Cierre semanal',date:'2026-06-14',time:'19:00',cat:'📊 Panel',status:'pending'}
 ];
+const descriptions = {
+  r1:'Confirmar disponibilidad y enviar aviso del turno por WhatsApp.',
+  r2:'Revisar horario reservado y dejar asentada la confirmacion.',
+  r3:'Controlar pagos vencidos y marcar los comprobantes que falten verificar.',
+  r4:'Enviar mensaje breve con dia, hora y sala asignada.',
+  r5:'Dejar camilla, insumos y ficha del paciente listos antes del turno.',
+  r6:'Resolver duplicacion de agenda y avisar al contacto afectado.',
+  r7:'Coordinar nueva disponibilidad y registrar respuesta.',
+  r8:'Revisar cambios del sabado y publicar la grilla actualizada.',
+  r9:'Revisar pendientes, completados y vencidos antes de cerrar la semana.'
+};
+reminders.forEach(r=>r.desc=descriptions[r.id]||'Tocar para ver descripcion, estado y opciones del recordatorio.');
 function mondayOf(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x}
 function iso(d){return d.toISOString().slice(0,10)}
 function dateAdd(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
@@ -99,11 +204,24 @@ function renderFilters(){const counts={all:reminders.length,pending:reminders.fi
 function renderCalendar(){renderFilters();const end=dateAdd(weekStart,6);document.getElementById('weekRange').textContent=`${fmt(weekStart)} – ${fmt(end)} 2026`;const days=Array.from({length:7},(_,i)=>dateAdd(weekStart,i));let html='<div class="corner"></div>';days.forEach((d,i)=>{html+=`<div class="day-head ${iso(d)==='2026-06-08'?'today':''}"><div><div class="day-num">${d.getDate()}</div><div class="day-name">${dayNames[i]}</div></div></div>`});const list=filterList();hours.forEach(h=>{html+=`<div class="time-cell">${h}</div>`;days.forEach(d=>{const items=list.filter(r=>r.date===iso(d)&&r.time===h);html+=`<div class="slot" onclick="quickCreate('${iso(d)}','${h}')">${renderEvents(items)}</div>`})});document.getElementById('calendar').innerHTML=html}
 function renderEvents(items){if(!items.length)return '';const visible=items.slice(0,1).map(renderEvent).join('');const extra=items.length>1?`<div class="overflow">+${items.length-1} más</div>`:'';return visible+extra}
 function renderEvent(r){const label=r.status==='done'?'✓ Hecho':r.status==='overdue'?'⚠ Vencido':'Pendiente';return `<article class="event ${r.status}" onclick="event.stopPropagation()"><button class="more-btn">⋮</button><div class="event-title">${r.status==='overdue'?'⚠ ':r.status==='done'?'✓ ':''}${r.title}</div><div class="event-meta"><span class="pill time">🕒 ${r.time}</span><span class="pill cat">${r.cat}</span><span class="pill status">${label}</span></div><div class="event-actions"><button class="done-btn" onclick="mark('${r.id}','done')">✓ Hecho</button><button class="cancel-btn" onclick="mark('${r.id}','overdue')">✕ Cancelar</button><button class="edit-btn">✎</button><button class="menu-mini">⋯</button></div></article>`}
-function mark(id,status){const r=reminders.find(x=>x.id===id);if(r){r.status=status;renderCalendar()}}
+function cleanCat(cat){return cat.replace(/[^\p{L}\p{N}\s]/gu,'').replace(/\s+/g,' ').trim()||'Personal'}
+function categoryVisual(cat){const key=cleanCat(cat).toLowerCase();if(key.includes('finanzas'))return{accent:'#d99700',soft:'#fff6dd',line:'#f4c95d'};if(key.includes('masajes'))return{accent:'#10a37f',soft:'#e9fbf5',line:'#8ee2c8'};if(key.includes('consultorio'))return{accent:'#2563eb',soft:'#edf4ff',line:'#a9c8ff'};if(key.includes('turnos'))return{accent:'#dc5a50',soft:'#fff0ee',line:'#f2aaa4'};if(key.includes('agenda'))return{accent:'#7c3aed',soft:'#f4efff',line:'#c8b4ff'};if(key.includes('panel'))return{accent:'#0f766e',soft:'#e7f7f5',line:'#98d8d2'};return{accent:'#475569',soft:'#f1f5f9',line:'#cbd5e1'}}
+function toggleEvent(id){expandedId=expandedId===id?null:id;renderCalendar()}
+function renderEvent(r){const label=r.status==='done'?'Hecho':r.status==='overdue'?'Vencido':'Pendiente';const visual=categoryVisual(r.cat);const expanded=expandedId===r.id?' expanded':'';const statusMark=r.status==='overdue'?'!':r.status==='done'?'OK':'';return `<article class="event ${r.status}${expanded}" style="--cat:${visual.accent};--cat-soft:${visual.soft};--cat-line:${visual.line}" onclick="event.stopPropagation();toggleEvent('${r.id}')"><button class="more-btn" onclick="event.stopPropagation();toggleEvent('${r.id}')">⋮</button><div class="event-title">${statusMark?statusMark+' ':''}${r.title}</div><div class="event-meta"><span class="pill time">${r.time}</span><span class="pill cat">${cleanCat(r.cat)}</span><span class="pill status">${label}</span></div><p class="event-desc">${r.desc||'Sin descripcion cargada.'}</p><div class="event-actions"><button class="done-btn" onclick="event.stopPropagation();mark('${r.id}','done')">Hecho</button><button class="cancel-btn" onclick="event.stopPropagation();mark('${r.id}','overdue')">Cancelar</button><button class="edit-btn" onclick="event.stopPropagation()">Editar</button><button class="menu-mini" onclick="event.stopPropagation()">Mas</button></div></article>`}
+function mark(id,status){const r=reminders.find(x=>x.id===id);if(r){r.status=status;expandedId=null;renderCalendar()}}
 function shiftWeek(n){weekStart=dateAdd(weekStart,n);renderCalendar()}
 function goToday(){weekStart=mondayOf(new Date('2026-06-08T09:00:00'));renderCalendar()}
 function quickCreate(date,time){reminders.push({id:Date.now().toString(36),title:'Nuevo recordatorio',date,time,cat:'📌 Personal',status:'pending'});renderCalendar()}
 function addDemoReminder(){reminders.push({id:Date.now().toString(36),title:'Recordatorio rápido',date:'2026-06-12',time:'16:00',cat:'📌 Personal',status:'pending'});renderCalendar()}
+function quickCreate(date,time){const id=Date.now().toString(36);reminders.push({id,title:'Nuevo recordatorio',date,time,cat:'Personal',status:'pending',desc:'Tocar para abrir descripcion y opciones.'});expandedId=id;renderCalendar()}
+function addDemoReminder(){const id=Date.now().toString(36);reminders.push({id,title:'Recordatorio rapido',date:'2026-06-12',time:'16:00',cat:'Personal',status:'pending',desc:'Recordatorio creado desde el boton principal.'});expandedId=id;renderCalendar()}
+function openBatchModal(){const modal=document.getElementById('batchModal');document.getElementById('batchFeedback').textContent='';modal.classList.add('open');modal.setAttribute('aria-hidden','false')}
+function closeBatchModal(){const modal=document.getElementById('batchModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}
+function dateFromInput(value){const d=new Date(value+'T00:00:00');d.setHours(0,0,0,0);return d}
+function selectedBatchDays(){return [...document.querySelectorAll('input[name="batchDay"]:checked')].map(input=>Number(input.value))}
+function createBatchReminders(){const title=document.getElementById('batchTitle').value.trim()||'Recordatorio';const cat=document.getElementById('batchCategory').value;const time=document.getElementById('batchTime').value||'09:00';const startValue=document.getElementById('batchStart').value;const endValue=document.getElementById('batchEnd').value;const desc=document.getElementById('batchDesc').value.trim()||'Recordatorio recurrente.';const feedback=document.getElementById('batchFeedback');const days=selectedBatchDays();if(!startValue||!endValue){feedback.textContent='Elegir fecha desde y hasta.';return}if(!days.length){feedback.textContent='Seleccionar al menos un dia.';return}const start=dateFromInput(startValue);const end=dateFromInput(endValue);if(end<start){feedback.textContent='La fecha hasta debe ser posterior.';return}let created=[];for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){if(days.includes(d.getDay())){const id='b'+Date.now().toString(36)+created.length.toString(36);const date=iso(d);reminders.push({id,title,date,time,cat,status:'pending',desc});created.push(date)}}if(!created.length){feedback.textContent='No hay fechas que coincidan con esos dias.';return}expandedId=reminders[reminders.length-1].id;weekStart=mondayOf(dateFromInput(created[0]));activeFilter='all';renderCalendar();feedback.textContent=`Se crearon ${created.length} recordatorios.`;setTimeout(closeBatchModal,700)}
+function sameHour(time,hour){return String(time||'').slice(0,2)===String(hour||'').slice(0,2)}
+function renderCalendar(){renderFilters();const end=dateAdd(weekStart,6);document.getElementById('weekRange').textContent=`${fmt(weekStart)} – ${fmt(end)} 2026`;const days=Array.from({length:7},(_,i)=>dateAdd(weekStart,i));let html='<div class="corner"></div>';days.forEach((d,i)=>{html+=`<div class="day-head ${iso(d)==='2026-06-08'?'today':''}"><div><div class="day-num">${d.getDate()}</div><div class="day-name">${dayNames[i]}</div></div></div>`});const list=filterList();hours.forEach(h=>{html+=`<div class="time-cell">${h}</div>`;days.forEach(d=>{const items=list.filter(r=>r.date===iso(d)&&sameHour(r.time,h));html+=`<div class="slot" onclick="quickCreate('${iso(d)}','${h}')">${renderEvents(items)}</div>`})});document.getElementById('calendar').innerHTML=html}
 renderCalendar();
 </script>
 </body>
