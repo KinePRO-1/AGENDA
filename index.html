@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}html{background:#d7dde2;min-height:100%}body{min-height:100dvh;max-width:430px;margin:0 auto;overflow-x:hidden;position:relative;background:radial-gradient(circle at 88% 14%,rgba(8,148,83,.06),transparent 26%),radial-gradient(circle at 16% 78%,rgba(8,148,83,.05),transparent 22%),#f8fbfa;color:#0c2631;font-family:"Inter","SF Pro Display","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 0 0 1px rgba(0,0,0,.03),0 30px 90px rgba(11,28,40,.18)}body:before{content:"";position:fixed;inset:0;max-width:430px;margin:0 auto;pointer-events:none;opacity:.32;background-image:radial-gradient(circle at 20px 20px,rgba(8,148,83,.1) 0 1px,transparent 1.5px),radial-gradient(circle at 72px 52px,rgba(12,38,49,.07) 0 1px,transparent 1.5px);background-size:86px 86px,118px 118px;mask-image:linear-gradient(to bottom,transparent 0,#000 190px,#000 calc(100% - 220px),transparent 100%)}button,input{font:inherit}button{cursor:pointer;border:0;background:none;color:inherit}.header{position:sticky;top:0;z-index:50;padding:42px 28px 16px;background:linear-gradient(180deg,rgba(248,251,250,.98) 0%,rgba(248,251,250,.9) 74%,rgba(248,251,250,0) 100%);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}.header-top{display:grid;grid-template-columns:1fr auto auto;align-items:start;gap:14px;margin-bottom:18px}.logo{font-size:38px;font-weight:900;line-height:.98;letter-spacing:0;color:#0c2631}.logo:after{content:attr(data-count) " pendientes";display:block;margin-top:10px;color:#089453;font-size:16px;font-weight:800;line-height:1.2}.header-icon{width:42px;height:42px;display:grid;place-items:center;color:#0d1e2e;font-size:32px;line-height:1}.search-wrap{position:relative}.search-wrap input{width:100%;min-height:52px;outline:none;background:rgba(255,255,255,.88);border:1px solid #e0e8e4;border-radius:999px;padding:0 52px 0 20px;color:#0c2631;font-size:15px;font-weight:650;box-shadow:0 10px 30px rgba(32,55,70,.08)}.search-wrap input::placeholder{color:#8a95a6;font-weight:650}.search-icon{position:absolute;right:18px;top:50%;transform:translateY(-50%);color:#627083;font-size:18px}.content{position:relative;z-index:1;padding:0 18px 28px}.quick-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:2px 0 14px}.filter-card{min-height:66px;padding:10px 8px;background:rgba(255,255,255,.88);border:1px solid #e0e8e4;border-radius:20px;box-shadow:0 10px 30px rgba(32,55,70,.08);text-align:left}.filter-card.active{border-color:#2f5be7;box-shadow:0 12px 34px rgba(47,91,231,.18)}.filter-line{width:7px;height:24px;border-radius:8px;margin-bottom:5px}.filter-num{font-size:22px;font-weight:900;line-height:1}.filter-label{font-size:10px;font-weight:850;color:#627083;line-height:1.1}.week-panel{background:rgba(255,255,255,.74);border:1px solid #e0e8e4;border-radius:28px;box-shadow:0 18px 44px rgba(32,55,70,.12);overflow:hidden;height:calc(100dvh - 238px);min-height:520px;display:flex;flex-direction:column}.week-nav{display:grid;grid-template-columns:46px 78px 46px 1fr;gap:8px;align-items:center;padding:14px 12px 12px;background:rgba(255,255,255,.92);border-bottom:1px solid #e7eee9;flex:0 0 auto;position:sticky;top:0;z-index:8}.nav-btn,.today-btn{height:42px;border-radius:999px;background:rgba(255,255,255,.92);border:1px solid #dfe7e4;box-shadow:0 8px 22px rgba(32,55,70,.08);font-weight:900;color:#2f5be7}.nav-btn{font-size:24px}.range{text-align:right;font-weight:900;font-size:15px;color:#121b2b;line-height:1.2}.calendar-scroll{overflow:auto;background:#fbfdfc;flex:1 1 auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}.calendar-scroll::-webkit-scrollbar{display:none}.calendar{min-width:760px;display:grid;grid-template-columns:56px repeat(7,minmax(100px,1fr));position:relative}.corner,.day-head{position:sticky;top:0;z-index:3;background:rgba(251,253,252,.96);border-bottom:1px solid #e0e8e4}.corner{left:0;z-index:4;border-right:1px solid #e0e8e4}.day-head{height:70px;display:grid;place-items:center;text-align:center;border-right:1px solid #e0e8e4}.day-num{font-size:26px;font-weight:900;color:#101827;line-height:1}.day-name{margin-top:3px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:850;color:#98a1b1}.day-head.today .day-num{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;margin:auto;background:#2f5be7;color:white}.time-cell{height:112px;position:sticky;left:0;z-index:2;background:rgba(251,253,252,.96);border-right:1px solid #e0e8e4;border-bottom:1px solid #e8efeb;color:#9ba4b4;font-size:13px;font-weight:850;padding:10px 8px}.slot{height:112px;position:relative;border-right:1px solid #e0e8e4;border-bottom:1px solid #e8efeb;background:rgba(255,255,255,.46);padding:5px}.slot:active{background:#f3faf6}.event{position:relative;border-radius:14px;padding:8px 8px 34px;margin-bottom:5px;min-height:96px;box-shadow:0 8px 22px rgba(32,55,70,.08);overflow:hidden}.event-title{font-size:12px;font-weight:900;line-height:1.12;color:#111827;margin-bottom:6px;padding-right:22px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.event-meta{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}.pill{display:inline-flex;align-items:center;gap:3px;min-height:20px;padding:0 6px;border-radius:999px;font-size:9.5px;font-weight:900;line-height:1;max-width:100%;white-space:nowrap}.event-actions{display:flex;gap:4px;align-items:center;position:absolute;left:7px;right:7px;bottom:7px}.event-actions button{height:22px;border-radius:999px;font-size:9.5px;font-weight:900;padding:0 7px;min-width:0}.event-actions .done-btn,.event-actions .cancel-btn{flex:1}.event-actions .edit-btn,.event-actions .menu-mini{width:24px;padding:0;flex:0 0 24px}.more-btn{position:absolute;right:7px;top:7px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.72);font-size:14px;font-weight:900;z-index:2}.pending{background:#fff8e8;border:2px solid #f4b02a}.pending .status{color:#8a5d00;background:#fff0bf}.pending .done-btn{background:#dff3e7;color:#006f4e}.pending .cancel-btn{background:#fde7e5;color:#b94b44}.done{background:#ecfdf5;border:2px solid #10b981}.done .event-title{color:#064e3b}.done .status{color:#047857;background:#d1fae5}.done .done-btn{background:#d1fae5;color:#047857}.done .cancel-btn{display:none}.overdue{background:#fff1f1;border:2px solid #d95d55}.overdue .status{color:#a31313;background:#fde1df}.overdue .done-btn{background:#dff3e7;color:#006f4e}.overdue .cancel-btn{background:#fde1df;color:#a31313}.cat{color:#059669;background:#e9fbf4;border:1px solid #a7f3d0}.time{color:#006f4e;background:#dff3e7}.edit-btn,.menu-mini{background:#eef2f2;color:#627083}.overflow{min-height:34px;border-radius:14px;border:1px dashed #cbd5e1;background:#f8fafc;color:#627083;display:grid;place-items:center;font-size:12px;font-weight:900}.bottom-nav{display:none!important}.nav-item,.nav-ico{display:none!important}.fab{position:fixed;right:calc(50% - 190px);bottom:24px;z-index:100;width:76px;height:76px;border-radius:50%;display:grid;place-items:center;color:white;background:radial-gradient(circle at 35% 25%,#15b66c,#008651 58%,#006f4e 100%);box-shadow:0 22px 42px rgba(0,135,80,.36);font-size:54px;font-weight:300}.legend{display:flex;gap:8px;overflow:auto;padding:0 0 14px}.legend-chip{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.9);border:1px solid #e0e8e4;box-shadow:0 8px 20px rgba(32,55,70,.08);font-size:12px;font-weight:850;color:#627083}.dot{width:9px;height:9px;border-radius:50%}@media(max-width:390px){.header{padding-left:22px;padding-right:22px}.logo{font-size:34px}.content{padding-left:14px;padding-right:14px}.week-panel{height:calc(100dvh - 226px);min-height:500px}.calendar{min-width:720px;grid-template-columns:54px repeat(7,minmax(95px,1fr))}.fab{right:24px;bottom:24px;width:70px;height:70px}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}html{background:#d7dde2;min-height:100%}body{min-height:100dvh;max-width:430px;margin:0 auto;overflow-x:hidden;position:relative;background:radial-gradient(circle at 88% 14%,rgba(8,148,83,.06),transparent 26%),radial-gradient(circle at 16% 78%,rgba(8,148,83,.05),transparent 22%),#f8fbfa;color:#0c2631;font-family:"Inter","SF Pro Display","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 0 0 1px rgba(0,0,0,.03),0 30px 90px rgba(11,28,40,.18)}body:before{content:"";position:fixed;inset:0;max-width:430px;margin:0 auto;pointer-events:none;opacity:.32;background-image:radial-gradient(circle at 20px 20px,rgba(8,148,83,.1) 0 1px,transparent 1.5px),radial-gradient(circle at 72px 52px,rgba(12,38,49,.07) 0 1px,transparent 1.5px);background-size:86px 86px,118px 118px;mask-image:linear-gradient(to bottom,transparent 0,#000 190px,#000 calc(100% - 220px),transparent 100%)}button,input{font:inherit}button{cursor:pointer;border:0;background:none;color:inherit}.header{position:sticky;top:0;z-index:50;padding:42px 28px 16px;background:linear-gradient(180deg,rgba(248,251,250,.98) 0%,rgba(248,251,250,.9) 74%,rgba(248,251,250,0) 100%);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}.header-top{display:grid;grid-template-columns:1fr auto auto;align-items:start;gap:14px;margin-bottom:18px}.logo{font-size:38px;font-weight:900;line-height:.98;letter-spacing:0;color:#0c2631}.logo:after{content:attr(data-count) " pendientes";display:block;margin-top:10px;color:#089453;font-size:16px;font-weight:800;line-height:1.2}.header-icon{width:42px;height:42px;display:grid;place-items:center;color:#0d1e2e;font-size:32px;line-height:1}.search-wrap{position:relative}.search-wrap input{width:100%;min-height:52px;outline:none;background:rgba(255,255,255,.88);border:1px solid #e0e8e4;border-radius:999px;padding:0 52px 0 20px;color:#0c2631;font-size:15px;font-weight:650;box-shadow:0 10px 30px rgba(32,55,70,.08)}.search-wrap input::placeholder{color:#8a95a6;font-weight:650}.search-icon{position:absolute;right:18px;top:50%;transform:translateY(-50%);color:#627083;font-size:18px}.content{position:relative;z-index:1;padding:0 18px 28px}.quick-stats{display:flex;gap:8px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;margin:0 0 10px;padding-bottom:4px;-webkit-overflow-scrolling:touch}.quick-stats::-webkit-scrollbar{display:none}.filter-card{flex:0 0 auto;min-height:66px;min-width:72px;padding:10px 10px;background:rgba(255,255,255,.88);border:1.5px solid #e0e8e4;border-radius:20px;box-shadow:0 10px 30px rgba(32,55,70,.08);text-align:left;transition:border-color .15s,box-shadow .15s}.filter-card.active{border-color:#2f5be7;box-shadow:0 12px 34px rgba(47,91,231,.18)}.filter-line{width:7px;height:24px;border-radius:8px;margin-bottom:5px}.filter-num{font-size:22px;font-weight:900;line-height:1}.filter-label{font-size:10px;font-weight:850;color:#627083;line-height:1.1;max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.week-panel{background:rgba(255,255,255,.74);border:1px solid #e0e8e4;border-radius:28px;box-shadow:0 18px 44px rgba(32,55,70,.12);overflow:hidden;height:calc(100dvh - 238px);min-height:520px;display:flex;flex-direction:column}.week-nav{display:grid;grid-template-columns:46px 78px 46px 1fr;gap:8px;align-items:center;padding:14px 12px 12px;background:rgba(255,255,255,.92);border-bottom:1px solid #e7eee9;flex:0 0 auto;position:sticky;top:0;z-index:8}.nav-btn,.today-btn{height:42px;border-radius:999px;background:rgba(255,255,255,.92);border:1px solid #dfe7e4;box-shadow:0 8px 22px rgba(32,55,70,.08);font-weight:900;color:#2f5be7}.nav-btn{font-size:24px}.range{text-align:right;font-weight:900;font-size:15px;color:#121b2b;line-height:1.2}.calendar-scroll{overflow:auto;background:#fbfdfc;flex:1 1 auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}.calendar-scroll::-webkit-scrollbar{display:none}.calendar{min-width:760px;display:grid;grid-template-columns:56px repeat(7,minmax(100px,1fr));position:relative}.corner,.day-head{position:sticky;top:0;z-index:3;background:rgba(251,253,252,.96);border-bottom:1px solid #e0e8e4}.corner{left:0;z-index:4;border-right:1px solid #e0e8e4}.day-head{height:70px;display:grid;place-items:center;text-align:center;border-right:1px solid #e0e8e4}.day-num{font-size:26px;font-weight:900;color:#101827;line-height:1}.day-name{margin-top:3px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:850;color:#98a1b1}.day-head.today .day-num{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;margin:auto;background:#2f5be7;color:white}.time-cell{height:112px;position:sticky;left:0;z-index:2;background:rgba(251,253,252,.96);border-right:1px solid #e0e8e4;border-bottom:1px solid #e8efeb;color:#9ba4b4;font-size:13px;font-weight:850;padding:10px 8px}.slot{height:112px;position:relative;border-right:1px solid #e0e8e4;border-bottom:1px solid #e8efeb;background:rgba(255,255,255,.46);padding:5px}.slot:active{background:#f3faf6}.event{position:relative;border-radius:14px;padding:8px 8px 34px;margin-bottom:5px;min-height:96px;box-shadow:0 8px 22px rgba(32,55,70,.08);overflow:hidden}.event-title{font-size:12px;font-weight:900;line-height:1.12;color:#111827;margin-bottom:6px;padding-right:22px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.event-meta{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}.pill{display:inline-flex;align-items:center;gap:3px;min-height:20px;padding:0 6px;border-radius:999px;font-size:9.5px;font-weight:900;line-height:1;max-width:100%;white-space:nowrap}.event-actions{display:flex;gap:4px;align-items:center;position:absolute;left:7px;right:7px;bottom:7px}.event-actions button{height:22px;border-radius:999px;font-size:9.5px;font-weight:900;padding:0 7px;min-width:0}.event-actions .done-btn,.event-actions .cancel-btn{flex:1}.event-actions .edit-btn,.event-actions .menu-mini{width:24px;padding:0;flex:0 0 24px}.more-btn{position:absolute;right:7px;top:7px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.72);font-size:14px;font-weight:900;z-index:2}.pending{background:#fff8e8;border:2px solid #f4b02a}.pending .status{color:#8a5d00;background:#fff0bf}.pending .done-btn{background:#dff3e7;color:#006f4e}.pending .cancel-btn{background:#fde7e5;color:#b94b44}.done{background:#ecfdf5;border:2px solid #10b981}.done .event-title{color:#064e3b}.done .status{color:#047857;background:#d1fae5}.done .done-btn{background:#d1fae5;color:#047857}.done .cancel-btn{display:none}.overdue{background:#fff1f1;border:2px solid #d95d55}.overdue .status{color:#a31313;background:#fde1df}.overdue .done-btn{background:#dff3e7;color:#006f4e}.overdue .cancel-btn{background:#fde1df;color:#a31313}.cat{color:#059669;background:#e9fbf4;border:1px solid #a7f3d0}.time{color:#006f4e;background:#dff3e7}.edit-btn,.menu-mini{background:#eef2f2;color:#627083}.overflow{min-height:34px;border-radius:14px;border:1px dashed #cbd5e1;background:#f8fafc;color:#627083;display:grid;place-items:center;font-size:12px;font-weight:900}.bottom-nav{display:none!important}.nav-item,.nav-ico{display:none!important}.fab{position:fixed;right:calc(50% - 190px);bottom:24px;z-index:100;width:76px;height:76px;border-radius:50%;display:grid;place-items:center;color:white;background:radial-gradient(circle at 35% 25%,#15b66c,#008651 58%,#006f4e 100%);box-shadow:0 22px 42px rgba(0,135,80,.36);font-size:54px;font-weight:300}.legend{display:flex;gap:8px;overflow:auto;padding:0 0 14px}.legend-chip{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.9);border:1px solid #e0e8e4;box-shadow:0 8px 20px rgba(32,55,70,.08);font-size:12px;font-weight:850;color:#627083}.dot{width:9px;height:9px;border-radius:50%}@media(max-width:390px){.header{padding-left:22px;padding-right:22px}.logo{font-size:34px}.content{padding-left:14px;padding-right:14px}.week-panel{height:calc(100dvh - 226px);min-height:500px}.calendar{min-width:720px;grid-template-columns:54px repeat(7,minmax(95px,1fr))}.fab{right:24px;bottom:24px;width:70px;height:70px}}
 /* Ajuste mobile: cabecera normal, grilla semanal con scroll interno y eventos por categoria */
 html{height:auto;overflow-x:hidden;background:#f8fbfa}
 body{min-height:100dvh;height:auto;overflow-x:hidden;overflow-y:auto;display:block;box-shadow:none}
@@ -28,22 +28,51 @@ body:before{inset:0 0 auto;height:100dvh}
 .time-cell,.slot{height:154px}
 .time-cell{font-size:13px;padding:10px 7px}
 .slot{padding:7px;overflow:visible}
-.event{--cat:#2f5be7;--cat-soft:#eef4ff;--cat-line:#b8c7ff;background:var(--cat-soft);border:1.5px solid var(--cat-line);border-left:5px solid var(--cat);min-height:76px;height:auto;border-radius:15px;padding:8px 7px 9px;box-shadow:0 8px 18px rgba(32,55,70,.07);transition:min-height .18s ease,box-shadow .18s ease,transform .18s ease}
-.event:active{transform:scale(.985)}
-.event.expanded{min-height:136px;box-shadow:0 14px 28px rgba(32,55,70,.14);z-index:6}
-.event-title{font-size:11.8px;line-height:1.18;margin-bottom:6px;padding-right:20px;-webkit-line-clamp:2}
-.event.expanded .event-title{-webkit-line-clamp:3}
-.event-meta{gap:4px;margin-bottom:0}
-.pill{min-height:18px;padding:0 6px;font-size:8.8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;background:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.48)}
-.cat{color:var(--cat);background:rgba(255,255,255,.72);border-color:var(--cat-line)}
-.event-desc{display:none;margin-top:7px;color:#425064;font-size:10px;font-weight:750;line-height:1.28}
-.event.expanded .event-desc{display:block}
-.event-actions{display:none;position:static;margin-top:8px;gap:4px}
-.event.expanded .event-actions{display:flex}
-.event-actions button{height:24px;font-size:8.8px;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.event-actions .edit-btn,.event-actions .menu-mini{width:24px;flex:0 0 24px}
-.more-btn{right:6px;top:6px;width:20px;height:20px;font-size:13px;color:var(--cat)}
-.overflow{min-height:26px;font-size:10px}
+/* === TARJETAS ESTILO REFERENCIA === */
+.event{--cat:#2f5be7;--cat-soft:#eef4ff;--cat-line:#b8c7ff;background:var(--cat-soft);border:2px solid var(--cat-line);min-height:auto;height:auto;border-radius:16px;padding:10px 9px 10px;box-shadow:0 6px 18px rgba(32,55,70,.09);transition:box-shadow .18s ease,transform .16s ease;cursor:pointer;position:relative}
+.event:active{transform:scale(.978)}
+.event-inner{display:flex;flex-direction:column;gap:6px}
+.event-header{display:flex;align-items:flex-start;gap:7px}
+.event-icon{width:30px;height:30px;min-width:30px;border-radius:50%;display:grid;place-items:center;font-size:15px;background:rgba(255,255,255,.72);border:1.5px solid var(--cat-line);flex-shrink:0}
+.event-title-wrap{flex:1;min-width:0}
+.event-title{font-size:11.5px;font-weight:900;line-height:1.2;color:#111827;margin:0;padding-right:20px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.event-pills{display:flex;flex-direction:column;gap:4px}
+.pill{display:inline-flex;align-items:center;gap:4px;min-height:20px;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:900;line-height:1;max-width:fit-content;white-space:nowrap;background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.5)}
+.pill-time{color:#006f4e;background:#dff3e7;border-color:#a7e3c8}
+.pill-cat{color:var(--cat);background:rgba(255,255,255,.82);border-color:var(--cat-line)}
+.pill-status{background:rgba(255,255,255,.82)}
+.more-btn{position:absolute;right:7px;top:8px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.72);font-size:13px;font-weight:900;z-index:2;color:var(--cat);border:1px solid var(--cat-line)}
+/* status dot badge en pill */
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.pending .pill-status{color:#8a5d00;background:#fff0bf;border-color:#f4d06a}
+.pending .status-dot{background:#d99700}
+.done .pill-status{color:#047857;background:#d1fae5;border-color:#6ee7b7}
+.done .status-dot{background:#10b981}
+.overdue .pill-status{color:#a31313;background:#fde1df;border-color:#f2aaa4}
+.overdue .status-dot{background:#d95d55}
+/* overflow count chip */
+.overflow{min-height:24px;font-size:9.5px;border-radius:12px;border:1px dashed #cbd5e1;background:#f8fafc;color:#627083;display:grid;place-items:center;font-weight:900;margin-top:3px}
+/* === MODAL DETALLE RECORDATORIO === */
+.detail-overlay{position:fixed;inset:0;z-index:300;background:rgba(12,38,49,.42);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;padding:16px}
+.detail-overlay.open{display:flex}
+.detail-sheet{width:min(100%,430px);background:#fbfdfc;border-radius:28px 28px 20px 20px;box-shadow:0 28px 80px rgba(11,28,40,.32);overflow:hidden;animation:slideUp .22s ease}
+@keyframes slideUp{from{transform:translateY(28px);opacity:.6}to{transform:translateY(0);opacity:1}}
+.detail-top{padding:20px 20px 0;display:flex;align-items:flex-start;gap:14px}
+.detail-icon-circle{width:52px;height:52px;min-width:52px;border-radius:50%;display:grid;place-items:center;font-size:26px;border:2px solid;flex-shrink:0}
+.detail-title-block{flex:1;min-width:0}
+.detail-title{font-size:20px;font-weight:900;line-height:1.1;color:#0c2631;margin:0}
+.detail-subtitle{margin-top:4px;font-size:12px;font-weight:750;color:#627083}
+.detail-close{width:36px;height:36px;border-radius:50%;background:#eef3f2;color:#334155;font-size:20px;font-weight:900;display:grid;place-items:center;flex-shrink:0}
+.detail-body{padding:16px 20px 22px;display:flex;flex-direction:column;gap:10px}
+.detail-chips{display:flex;flex-wrap:wrap;gap:7px}
+.detail-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:850;border:1.5px solid}
+.detail-desc{background:#f4f8f6;border-radius:14px;padding:12px 14px;font-size:13px;font-weight:750;color:#354a58;line-height:1.45}
+.detail-desc-label{font-size:10px;font-weight:900;color:#9ba4b4;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.detail-actions{display:flex;gap:8px;margin-top:2px}
+.detail-actions button{flex:1;height:46px;border-radius:999px;font-size:13px;font-weight:900}
+.detail-done-btn{background:#dff3e7;color:#006f4e}
+.detail-cancel-btn{background:#fde7e5;color:#b94b44}
+.detail-edit-btn{flex:0 0 46px;background:#eef2f2;color:#627083;font-size:18px}
 .fab{right:max(18px,calc(50% - 188px));bottom:18px;width:68px;height:68px;font-size:48px}
 .batch-modal{position:fixed;inset:0;z-index:220;display:none;align-items:flex-end;justify-content:center;background:rgba(12,38,49,.36);padding:18px}
 .batch-modal.open{display:flex}
@@ -67,6 +96,21 @@ body:before{inset:0 0 auto;height:100dvh}
 .ghost-btn{flex:0 0 112px;background:#eef3f2;color:#475569}
 .save-batch-btn{flex:1;background:#089453;color:white;box-shadow:0 12px 26px rgba(8,148,83,.24)}
 .batch-feedback{min-height:18px;margin-top:10px;color:#047857;font-size:12px;font-weight:850}
+/* === LIST VIEW === */
+.list-empty{text-align:center;padding:48px 20px;color:#9ba4b4;font-size:14px;font-weight:750}
+.list-group-label{font-size:11px;font-weight:900;color:#9ba4b4;text-transform:uppercase;letter-spacing:.07em;margin:14px 0 7px 2px}
+.list-group-label:first-child{margin-top:0}
+.list-item{display:flex;align-items:center;gap:12px;background:white;border:1.5px solid #e0e8e4;border-radius:18px;padding:12px 14px;margin-bottom:8px;box-shadow:0 4px 14px rgba(32,55,70,.06);cursor:pointer;transition:box-shadow .15s,transform .13s}
+.list-item:active{transform:scale(.985)}
+.list-item-icon{width:38px;height:38px;min-width:38px;border-radius:50%;display:grid;place-items:center;font-size:18px;border:1.5px solid;flex-shrink:0}
+.list-item-body{flex:1;min-width:0}
+.list-item-title{font-size:14px;font-weight:900;color:#111827;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item-meta{margin-top:4px;display:flex;gap:6px;flex-wrap:wrap}
+.list-item-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:900;border:1px solid}
+.list-item-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* Wider event cards in calendar */
+.slot{padding:4px 3px}
+.event{min-width:0}
 @media(max-width:390px){.header{padding:34px 22px 12px}.content{padding-left:12px;padding-right:12px}.week-panel{height:calc(100dvh - 222px);min-height:420px}.calendar{min-width:720px;grid-template-columns:50px repeat(7,minmax(95px,1fr))}.time-cell,.slot{height:150px}.event{min-height:74px}.event.expanded{min-height:132px}.fab{right:18px;bottom:16px;width:64px;height:64px}.batch-modal{padding:10px}.batch-sheet{padding:16px}.batch-grid{gap:9px}.weekday-picker{gap:4px}}
 </style>
 </head>
@@ -90,15 +134,19 @@ body:before{inset:0 0 auto;height:100dvh}
     <span class="legend-chip"><span class="dot" style="background:#d95d55"></span>Vencido</span>
     <span class="legend-chip"><span class="dot" style="background:#2f5be7"></span>Seleccionado</span>
   </div>
-  <section class="week-panel">
-    <div class="week-nav">
+  <section class="week-panel" id="weekPanel">
+    <div class="week-nav" id="calendarNav">
       <button class="nav-btn" onclick="shiftWeek(-7)">‹</button>
       <button class="today-btn" onclick="goToday()">Hoy</button>
       <button class="nav-btn" onclick="shiftWeek(7)">›</button>
       <div class="range" id="weekRange"></div>
     </div>
-    <div class="calendar-scroll">
+    <div class="calendar-scroll" id="calendarScroll">
       <div class="calendar" id="calendar"></div>
+    </div>
+    <!-- LIST VIEW -->
+    <div class="list-view" id="listView" style="display:none;flex:1 1 auto;overflow:auto;padding:14px 14px 18px;">
+      <div id="listContent"></div>
     </div>
   </section>
 </main>
@@ -166,7 +214,37 @@ body:before{inset:0 0 auto;height:100dvh}
   </section>
 </div>
 
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <section class="detail-sheet" id="detailSheet">
+    <div class="detail-top">
+      <div class="detail-icon-circle" id="detailIcon"></div>
+      <div class="detail-title-block">
+        <h2 class="detail-title" id="detailTitle"></h2>
+        <p class="detail-subtitle" id="detailSubtitle"></p>
+      </div>
+      <button class="detail-close" onclick="closeDetailBtn()">×</button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-chips" id="detailChips"></div>
+      <div class="detail-desc">
+        <div class="detail-desc-label">Descripción</div>
+        <div id="detailDesc"></div>
+      </div>
+      <div class="detail-actions">
+        <button class="detail-done-btn" id="detailDoneBtn">✓ Marcar hecho</button>
+        <button class="detail-cancel-btn" id="detailCancelBtn">✕ Cancelar</button>
+        <button class="detail-edit-btn">✎</button>
+      </div>
+    </div>
+  </section>
+</div>
+
 <script>
+// === DETAIL MODAL ===
+function catIcon(cat){const key=(cat||'').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');if(key.includes('finanza'))return'💰';if(key.includes('masaje'))return'💆';if(key.includes('consultorio'))return'🏥';if(key.includes('turno'))return'📅';if(key.includes('agenda'))return'📆';if(key.includes('panel'))return'📊';if(key.includes('personal'))return'📌';return'🔔'}
+function openDetail(id){const r=reminders.find(x=>x.id===id);if(!r)return;const visual=categoryVisual(r.cat);const label=r.status==='done'?'Hecho':r.status==='overdue'?'Vencido':'Pendiente';const statusColor=r.status==='done'?'#10b981':r.status==='overdue'?'#d95d55':'#d99700';const statusBg=r.status==='done'?'#d1fae5':r.status==='overdue'?'#fde1df':'#fff0bf';const statusBorder=r.status==='done'?'#6ee7b7':r.status==='overdue'?'#f2aaa4':'#f4d06a';document.getElementById('detailIcon').textContent=catIcon(r.cat);document.getElementById('detailIcon').style.cssText=`background:${visual.soft};border-color:${visual.line};color:${visual.accent}`;document.getElementById('detailTitle').textContent=r.title;document.getElementById('detailSubtitle').textContent=`${r.date} · ${r.time}`;document.getElementById('detailDesc').textContent=r.desc||'Sin descripción cargada.';document.getElementById('detailChips').innerHTML=`<span class="detail-chip" style="color:#006f4e;background:#dff3e7;border-color:#a7e3c8">🕐 ${r.time}</span><span class="detail-chip" style="color:${visual.accent};background:${visual.soft};border-color:${visual.line}">🏷 ${cleanCat(r.cat)}</span><span class="detail-chip" style="color:${statusColor};background:${statusBg};border-color:${statusBorder}"><span style="width:8px;height:8px;border-radius:50%;background:${statusColor};display:inline-block;margin-right:2px"></span>${label}</span>`;document.getElementById('detailDoneBtn').onclick=()=>{mark(id,'done');closeDetailBtn()};document.getElementById('detailCancelBtn').onclick=()=>{mark(id,'overdue');closeDetailBtn()};document.getElementById('detailOverlay').classList.add('open')}
+function closeDetail(e){if(e.target===document.getElementById('detailOverlay'))closeDetailBtn()}
+function closeDetailBtn(){document.getElementById('detailOverlay').classList.remove('open')}
 const hours = Array.from({length:13},(_,i)=>String(i+8).padStart(2,'0')+':00');
 const dayNames = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 let activeFilter = 'all';
@@ -199,29 +277,89 @@ function mondayOf(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.
 function iso(d){return d.toISOString().slice(0,10)}
 function dateAdd(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
 function fmt(d){return d.toLocaleDateString('es-AR',{day:'numeric',month:'short'}).replace('.','')}
-function filterList(){const q=document.getElementById('searchInput').value.toLowerCase().trim();return reminders.filter(r=>{if(q&&!(`${r.title} ${r.cat} ${r.status}`.toLowerCase().includes(q)))return false;if(activeFilter==='all')return true;return r.status===activeFilter})}
-function renderFilters(){const counts={all:reminders.length,pending:reminders.filter(r=>r.status==='pending').length,done:reminders.filter(r=>r.status==='done').length,overdue:reminders.filter(r=>r.status==='overdue').length};document.getElementById('logo').dataset.count=counts.pending;const data=[['all','Todos','#2f5be7'],['pending','Pendientes','#f4b02a'],['done','Completados','#10b981'],['overdue','Vencidos','#d95d55']];document.getElementById('filters').innerHTML=data.map(([key,label,color])=>`<button class="filter-card ${activeFilter===key?'active':''}" onclick="activeFilter='${key}';renderCalendar()"><div class="filter-line" style="background:${color}"></div><div class="filter-num" style="color:${color}">${counts[key]}</div><div class="filter-label">${label}</div></button>`).join('')}
+function filterList(){const q=document.getElementById('searchInput').value.toLowerCase().trim();return reminders.filter(r=>{if(q&&!(`${r.title} ${r.cat} ${r.status}`.toLowerCase().includes(q)))return false;if(activeFilter==='all')return true;return cleanCat(r.cat).toLowerCase()===activeFilter.toLowerCase()})}
+let listViewActive = false;
+function setFilter(key){
+  if(activeFilter===key&&listViewActive){activeFilter='all';listViewActive=false;toggleView(false);renderCalendar();return}
+  activeFilter=key;
+  listViewActive=(key!=='all');
+  renderFilters();
+  toggleView(key!=='all');
+  if(key==='all')renderCalendar();
+}
+function toggleView(showList){
+  document.getElementById('calendarNav').style.display=showList?'none':'grid';
+  document.getElementById('calendarScroll').style.display=showList?'none':'block';
+  document.getElementById('listView').style.display=showList?'block':'none';
+  if(showList)renderListView();
+}
+function renderListView(){
+  const list=filterList().slice().sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  const el=document.getElementById('listContent');
+  if(!list.length){el.innerHTML='<div class="list-empty">No hay recordatorios en esta categoría.</div>';return}
+  let lastDate='';let html='';
+  list.forEach(r=>{
+    const visual=categoryVisual(r.cat);
+    const label=r.status==='done'?'Hecho':r.status==='overdue'?'Vencido':'Pendiente';
+    const statusColor=r.status==='done'?'#10b981':r.status==='overdue'?'#d95d55':'#d99700';
+    const statusBg=r.status==='done'?'#d1fae5':r.status==='overdue'?'#fde1df':'#fff0bf';
+    const statusBorder=r.status==='done'?'#6ee7b7':r.status==='overdue'?'#f2aaa4':'#f4d06a';
+    if(r.date!==lastDate){
+      const d=new Date(r.date+'T00:00:00');
+      const label2=d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+      html+=`<div class="list-group-label">${label2}</div>`;
+      lastDate=r.date;
+    }
+    html+=`<div class="list-item" onclick="openDetail('${r.id}')">
+      <div class="list-item-icon" style="background:${visual.soft};border-color:${visual.line};color:${visual.accent}">${catIcon(r.cat)}</div>
+      <div class="list-item-body">
+        <div class="list-item-title">${r.title}</div>
+        <div class="list-item-meta">
+          <span class="list-item-badge" style="color:#006f4e;background:#dff3e7;border-color:#a7e3c8">🕐 ${r.time}</span>
+          <span class="list-item-badge" style="color:${visual.accent};background:${visual.soft};border-color:${visual.line}">🏷 ${cleanCat(r.cat)}</span>
+          <span class="list-item-badge" style="color:${statusColor};background:${statusBg};border-color:${statusBorder}">${label}</span>
+        </div>
+      </div>
+      <div class="list-item-status" style="background:${statusColor}"></div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+function getCategoryAccent(catName){return categoryVisual(catName).accent}
+function renderFilters(){
+  const pending=reminders.filter(r=>r.status==='pending').length;
+  document.getElementById('logo').dataset.count=pending;
+  // Collect unique categories from reminders
+  const catMap={};
+  reminders.forEach(r=>{const name=cleanCat(r.cat);if(!catMap[name])catMap[name]=0;catMap[name]++});
+  const cats=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  const totalCount=reminders.length;
+  const allActive=activeFilter==='all';
+  let html=`<button class="filter-card ${allActive?'active':''}" onclick="setFilter('all')"><div class="filter-line" style="background:#2f5be7"></div><div class="filter-num" style="color:#2f5be7">${totalCount}</div><div class="filter-label">Todas</div></button>`;
+  cats.forEach(([name,count])=>{
+    const accent=getCategoryAccent(name);
+    const isActive=activeFilter===name.toLowerCase();
+    html+=`<button class="filter-card ${isActive?'active':''}" onclick="setFilter('${name.toLowerCase()}')"><div class="filter-line" style="background:${accent}"></div><div class="filter-num" style="color:${accent}">${count}</div><div class="filter-label">${name}</div></button>`;
+  });
+  document.getElementById('filters').innerHTML=html;
+}
 function renderCalendar(){renderFilters();const end=dateAdd(weekStart,6);document.getElementById('weekRange').textContent=`${fmt(weekStart)} – ${fmt(end)} 2026`;const days=Array.from({length:7},(_,i)=>dateAdd(weekStart,i));let html='<div class="corner"></div>';days.forEach((d,i)=>{html+=`<div class="day-head ${iso(d)==='2026-06-08'?'today':''}"><div><div class="day-num">${d.getDate()}</div><div class="day-name">${dayNames[i]}</div></div></div>`});const list=filterList();hours.forEach(h=>{html+=`<div class="time-cell">${h}</div>`;days.forEach(d=>{const items=list.filter(r=>r.date===iso(d)&&r.time===h);html+=`<div class="slot" onclick="quickCreate('${iso(d)}','${h}')">${renderEvents(items)}</div>`})});document.getElementById('calendar').innerHTML=html}
 function renderEvents(items){if(!items.length)return '';const visible=items.slice(0,1).map(renderEvent).join('');const extra=items.length>1?`<div class="overflow">+${items.length-1} más</div>`:'';return visible+extra}
-function renderEvent(r){const label=r.status==='done'?'✓ Hecho':r.status==='overdue'?'⚠ Vencido':'Pendiente';return `<article class="event ${r.status}" onclick="event.stopPropagation()"><button class="more-btn">⋮</button><div class="event-title">${r.status==='overdue'?'⚠ ':r.status==='done'?'✓ ':''}${r.title}</div><div class="event-meta"><span class="pill time">🕒 ${r.time}</span><span class="pill cat">${r.cat}</span><span class="pill status">${label}</span></div><div class="event-actions"><button class="done-btn" onclick="mark('${r.id}','done')">✓ Hecho</button><button class="cancel-btn" onclick="mark('${r.id}','overdue')">✕ Cancelar</button><button class="edit-btn">✎</button><button class="menu-mini">⋯</button></div></article>`}
+function renderEvent(r){const visual=categoryVisual(r.cat);const label=r.status==='done'?'Hecho':r.status==='overdue'?'Vencido':'Pendiente';const statusColor=r.status==='done'?'#047857':r.status==='overdue'?'#a31313':'#8a5d00';const statusBg=r.status==='done'?'#d1fae5':r.status==='overdue'?'#fde1df':'#fff0bf';const statusBorder=r.status==='done'?'#6ee7b7':r.status==='overdue'?'#f2aaa4':'#f4d06a';const dotColor=r.status==='done'?'#10b981':r.status==='overdue'?'#d95d55':'#d99700';return `<article class="event ${r.status}" style="--cat:${visual.accent};--cat-soft:${visual.soft};--cat-line:${visual.line}" onclick="event.stopPropagation();openDetail('${r.id}')"><button class="more-btn" onclick="event.stopPropagation();openDetail('${r.id}')">⋮</button><div class="event-inner"><div class="event-header"><div class="event-icon">${catIcon(r.cat)}</div><div class="event-title-wrap"><div class="event-title">${r.title}</div></div></div><div class="event-pills"><span class="pill pill-time">🕐 ${r.time}</span><span class="pill pill-cat">🏷 ${cleanCat(r.cat)}</span><span class="pill pill-status" style="color:${statusColor};background:${statusBg};border-color:${statusBorder}"><span class="status-dot" style="background:${dotColor}"></span>${label}</span></div></div></article>`}
 function cleanCat(cat){return cat.replace(/[^\p{L}\p{N}\s]/gu,'').replace(/\s+/g,' ').trim()||'Personal'}
 function categoryVisual(cat){const key=cleanCat(cat).toLowerCase();if(key.includes('finanzas'))return{accent:'#d99700',soft:'#fff6dd',line:'#f4c95d'};if(key.includes('masajes'))return{accent:'#10a37f',soft:'#e9fbf5',line:'#8ee2c8'};if(key.includes('consultorio'))return{accent:'#2563eb',soft:'#edf4ff',line:'#a9c8ff'};if(key.includes('turnos'))return{accent:'#dc5a50',soft:'#fff0ee',line:'#f2aaa4'};if(key.includes('agenda'))return{accent:'#7c3aed',soft:'#f4efff',line:'#c8b4ff'};if(key.includes('panel'))return{accent:'#0f766e',soft:'#e7f7f5',line:'#98d8d2'};return{accent:'#475569',soft:'#f1f5f9',line:'#cbd5e1'}}
-function toggleEvent(id){expandedId=expandedId===id?null:id;renderCalendar()}
-function renderEvent(r){const label=r.status==='done'?'Hecho':r.status==='overdue'?'Vencido':'Pendiente';const visual=categoryVisual(r.cat);const expanded=expandedId===r.id?' expanded':'';const statusMark=r.status==='overdue'?'!':r.status==='done'?'OK':'';return `<article class="event ${r.status}${expanded}" style="--cat:${visual.accent};--cat-soft:${visual.soft};--cat-line:${visual.line}" onclick="event.stopPropagation();toggleEvent('${r.id}')"><button class="more-btn" onclick="event.stopPropagation();toggleEvent('${r.id}')">⋮</button><div class="event-title">${statusMark?statusMark+' ':''}${r.title}</div><div class="event-meta"><span class="pill time">${r.time}</span><span class="pill cat">${cleanCat(r.cat)}</span><span class="pill status">${label}</span></div><p class="event-desc">${r.desc||'Sin descripcion cargada.'}</p><div class="event-actions"><button class="done-btn" onclick="event.stopPropagation();mark('${r.id}','done')">Hecho</button><button class="cancel-btn" onclick="event.stopPropagation();mark('${r.id}','overdue')">Cancelar</button><button class="edit-btn" onclick="event.stopPropagation()">Editar</button><button class="menu-mini" onclick="event.stopPropagation()">Mas</button></div></article>`}
 function mark(id,status){const r=reminders.find(x=>x.id===id);if(r){r.status=status;expandedId=null;renderCalendar()}}
 function shiftWeek(n){weekStart=dateAdd(weekStart,n);renderCalendar()}
 function goToday(){weekStart=mondayOf(new Date('2026-06-08T09:00:00'));renderCalendar()}
-function quickCreate(date,time){reminders.push({id:Date.now().toString(36),title:'Nuevo recordatorio',date,time,cat:'📌 Personal',status:'pending'});renderCalendar()}
-function addDemoReminder(){reminders.push({id:Date.now().toString(36),title:'Recordatorio rápido',date:'2026-06-12',time:'16:00',cat:'📌 Personal',status:'pending'});renderCalendar()}
-function quickCreate(date,time){const id=Date.now().toString(36);reminders.push({id,title:'Nuevo recordatorio',date,time,cat:'Personal',status:'pending',desc:'Tocar para abrir descripcion y opciones.'});expandedId=id;renderCalendar()}
-function addDemoReminder(){const id=Date.now().toString(36);reminders.push({id,title:'Recordatorio rapido',date:'2026-06-12',time:'16:00',cat:'Personal',status:'pending',desc:'Recordatorio creado desde el boton principal.'});expandedId=id;renderCalendar()}
+function quickCreate(date,time){const id=Date.now().toString(36);reminders.push({id,title:'Nuevo recordatorio',date,time,cat:'Personal',status:'pending',desc:'Tocar para abrir descripcion y opciones.'});renderCalendar();openDetail(id)}
+function addDemoReminder(){const id=Date.now().toString(36);reminders.push({id,title:'Recordatorio rapido',date:'2026-06-12',time:'16:00',cat:'Personal',status:'pending',desc:'Recordatorio creado desde el boton principal.'});renderCalendar();openDetail(id)}
 function openBatchModal(){const modal=document.getElementById('batchModal');document.getElementById('batchFeedback').textContent='';modal.classList.add('open');modal.setAttribute('aria-hidden','false')}
 function closeBatchModal(){const modal=document.getElementById('batchModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}
 function dateFromInput(value){const d=new Date(value+'T00:00:00');d.setHours(0,0,0,0);return d}
 function selectedBatchDays(){return [...document.querySelectorAll('input[name="batchDay"]:checked')].map(input=>Number(input.value))}
-function createBatchReminders(){const title=document.getElementById('batchTitle').value.trim()||'Recordatorio';const cat=document.getElementById('batchCategory').value;const time=document.getElementById('batchTime').value||'09:00';const startValue=document.getElementById('batchStart').value;const endValue=document.getElementById('batchEnd').value;const desc=document.getElementById('batchDesc').value.trim()||'Recordatorio recurrente.';const feedback=document.getElementById('batchFeedback');const days=selectedBatchDays();if(!startValue||!endValue){feedback.textContent='Elegir fecha desde y hasta.';return}if(!days.length){feedback.textContent='Seleccionar al menos un dia.';return}const start=dateFromInput(startValue);const end=dateFromInput(endValue);if(end<start){feedback.textContent='La fecha hasta debe ser posterior.';return}let created=[];for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){if(days.includes(d.getDay())){const id='b'+Date.now().toString(36)+created.length.toString(36);const date=iso(d);reminders.push({id,title,date,time,cat,status:'pending',desc});created.push(date)}}if(!created.length){feedback.textContent='No hay fechas que coincidan con esos dias.';return}expandedId=reminders[reminders.length-1].id;weekStart=mondayOf(dateFromInput(created[0]));activeFilter='all';renderCalendar();feedback.textContent=`Se crearon ${created.length} recordatorios.`;setTimeout(closeBatchModal,700)}
+function createBatchReminders(){const title=document.getElementById('batchTitle').value.trim()||'Recordatorio';const cat=document.getElementById('batchCategory').value;const time=document.getElementById('batchTime').value||'09:00';const startValue=document.getElementById('batchStart').value;const endValue=document.getElementById('batchEnd').value;const desc=document.getElementById('batchDesc').value.trim()||'Recordatorio recurrente.';const feedback=document.getElementById('batchFeedback');const days=selectedBatchDays();if(!startValue||!endValue){feedback.textContent='Elegir fecha desde y hasta.';return}if(!days.length){feedback.textContent='Seleccionar al menos un dia.';return}const start=dateFromInput(startValue);const end=dateFromInput(endValue);if(end<start){feedback.textContent='La fecha hasta debe ser posterior.';return}let created=[];for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){if(days.includes(d.getDay())){const id='b'+Date.now().toString(36)+created.length.toString(36);const date=iso(d);reminders.push({id,title,date,time,cat,status:'pending',desc});created.push(date)}}if(!created.length){feedback.textContent='No hay fechas que coincidan con esos dias.';return}expandedId=reminders[reminders.length-1].id;weekStart=mondayOf(dateFromInput(created[0]));activeFilter='all';listViewActive=false;toggleView(false);renderCalendar();feedback.textContent=`Se crearon ${created.length} recordatorios.`;setTimeout(closeBatchModal,700)}
 function sameHour(time,hour){return String(time||'').slice(0,2)===String(hour||'').slice(0,2)}
-function renderCalendar(){renderFilters();const end=dateAdd(weekStart,6);document.getElementById('weekRange').textContent=`${fmt(weekStart)} – ${fmt(end)} 2026`;const days=Array.from({length:7},(_,i)=>dateAdd(weekStart,i));let html='<div class="corner"></div>';days.forEach((d,i)=>{html+=`<div class="day-head ${iso(d)==='2026-06-08'?'today':''}"><div><div class="day-num">${d.getDate()}</div><div class="day-name">${dayNames[i]}</div></div></div>`});const list=filterList();hours.forEach(h=>{html+=`<div class="time-cell">${h}</div>`;days.forEach(d=>{const items=list.filter(r=>r.date===iso(d)&&sameHour(r.time,h));html+=`<div class="slot" onclick="quickCreate('${iso(d)}','${h}')">${renderEvents(items)}</div>`})});document.getElementById('calendar').innerHTML=html}
+function renderCalendar(){renderFilters();if(listViewActive){renderListView();return}const end=dateAdd(weekStart,6);document.getElementById('weekRange').textContent=`${fmt(weekStart)} – ${fmt(end)} 2026`;const days=Array.from({length:7},(_,i)=>dateAdd(weekStart,i));let html='<div class="corner"></div>';days.forEach((d,i)=>{html+=`<div class="day-head ${iso(d)==='2026-06-08'?'today':''}"><div><div class="day-num">${d.getDate()}</div><div class="day-name">${dayNames[i]}</div></div></div>`});const list=filterList();hours.forEach(h=>{html+=`<div class="time-cell">${h}</div>`;days.forEach(d=>{const items=list.filter(r=>r.date===iso(d)&&sameHour(r.time,h));html+=`<div class="slot" onclick="quickCreate('${iso(d)}','${h}')">${renderEvents(items)}</div>`})});document.getElementById('calendar').innerHTML=html}
 renderCalendar();
 </script>
 </body>
