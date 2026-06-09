@@ -133,6 +133,10 @@
 <div class="modal" id="statsModal"><section class="sheet"><div class="sheet-head"><div><h2>Estadísticas</h2><p>Resumen actualizado automáticamente.</p></div><button class="close" onclick="closeModal('statsModal')">×</button></div><div class="stats-grid" id="statsGrid"></div><div id="statsExtra" style="margin-top:12px"></div></section></div>
 <div class="toast" id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
 <script>
 /* ========================= ESTADO GLOBAL ========================= */
 const STORE_KEY='agenda_recordatorios_v3';
@@ -161,11 +165,79 @@ const DEFAULT_STATE={
 let state=loadState();
 let activeId=null;let editingId=null;let pendingScopeAction=null;let draggedId=null;let lastTouch={x:0,y:0,t:0};let notificationTimers=[];
 
+const firebaseConfig={
+  apiKey:"AIzaSyB5VKkrUiwptpk-z99ORY-VF492gFD_FtA",
+  authDomain:"agenda-d3987.firebaseapp.com",
+  projectId:"agenda-d3987",
+  storageBucket:"agenda-d3987.firebasestorage.app",
+  messagingSenderId:"649656331502",
+  appId:"1:649656331502:web:3a34b5eda4e2461fab97ff"
+};
+const FIREBASE_DOC_PATH='agenda/estado-global';
+let db=null;
+let cloudDocRef=null;
+let unsubscribeCloud=null;
+let isApplyingRemote=false;
+let isFirebaseReady=false;
+let lastCloudWrite=0;
+
 /* ========================= PERSISTENCIA ========================= */
 function loadState(){try{const raw=localStorage.getItem(STORE_KEY);if(raw){const parsed=JSON.parse(raw);return normalizeState(parsed)}}catch(e){}return normalizeState(structuredClone(DEFAULT_STATE))}
-function saveState(){state.prefs.order=state.prefs.sort;localStorage.setItem(STORE_KEY,JSON.stringify(state));scheduleNotifications();renderAll(false)}
+function saveState(){state.prefs.order=state.prefs.sort;localStorage.setItem(STORE_KEY,JSON.stringify(state));scheduleNotifications();renderAll(false);pushStateToCloud()}
 function normalizeState(s){s=s||{};s.reminders=Array.isArray(s.reminders)?s.reminders:[];s.categories=Array.isArray(s.categories)?s.categories:structuredClone(DEFAULT_STATE.categories);s.prefs={...DEFAULT_STATE.prefs,...(s.prefs||{})};s.cursorDate=s.cursorDate||todayISO();const seen=new Set();s.reminders=s.reminders.filter(r=>{if(!r.id||seen.has(r.id))return false;seen.add(r.id);return true}).map(r=>normalizeReminderTime({desc:'',priority:'normal',alert:'none',status:'pending',...r,cat:cleanCat(r.cat||'Personal')}));s.categories=s.categories.map((c,i)=>({name:cleanCat(c.name||String(c)||'Categoría'),color:c.color||DEFAULT_COLORS[i%DEFAULT_COLORS.length]}));ensureCategoriesForReminders(s);return s}
 function ensureCategoriesForReminders(s=state){s.reminders.forEach(r=>{if(!s.categories.some(c=>same(c.name,r.cat)))s.categories.push({name:r.cat,color:DEFAULT_COLORS[s.categories.length%DEFAULT_COLORS.length]})})}
+async function initFirebaseSync(){
+  if(!window.firebase){toast('Firebase no cargó. Se usa guardado local.');renderNotice();return}
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+    try{await firebase.auth().signInAnonymously()}catch(authError){console.warn('Auth anónima no disponible. Se intenta Firestore directo.',authError)}
+    db=firebase.firestore();
+    db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+    cloudDocRef=db.doc(FIREBASE_DOC_PATH);
+    const snap=await cloudDocRef.get();
+    if(snap.exists&&snap.data()?.state){
+      applyCloudState(snap.data().state);
+      toast('Base sincronizada con Firebase');
+    }else{
+      await pushStateToCloud(true);
+      toast('Base inicial subida a Firebase');
+    }
+    unsubscribeCloud=cloudDocRef.onSnapshot(s=>{
+      if(!s.exists||!s.data()?.state)return;
+      const remoteUpdatedAt=Number(s.data().updatedAt||0);
+      if(remoteUpdatedAt&&remoteUpdatedAt===lastCloudWrite)return;
+      applyCloudState(s.data().state);
+    },err=>{console.warn(err);toast('Firebase sin permiso o sin conexión. Se mantiene guardado local.')});
+    isFirebaseReady=true;
+    renderNotice();
+  }catch(e){
+    console.warn(e);
+    isFirebaseReady=false;
+    toast('Firebase no disponible. Se mantiene guardado local.');
+    renderNotice();
+  }
+}
+function applyCloudState(remoteState){
+  isApplyingRemote=true;
+  state=normalizeState(remoteState);
+  localStorage.setItem(STORE_KEY,JSON.stringify(state));
+  scheduleNotifications();
+  renderAll(false);
+  isApplyingRemote=false;
+}
+async function pushStateToCloud(force=false){
+  if(isApplyingRemote||!cloudDocRef)return;
+  const now=Date.now();
+  lastCloudWrite=now;
+  try{
+    await cloudDocRef.set({state:JSON.parse(JSON.stringify(state)),updatedAt:now,version:4},{merge:true});
+    isFirebaseReady=true;
+  }catch(e){
+    console.warn(e);
+    isFirebaseReady=false;
+    if(force)throw e;
+  }
+}
 
 /* ========================= UTILIDADES ========================= */
 function id(){return 'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
@@ -197,7 +269,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open')}
 function renderAll(rebuild=true){applyTheme();syncControls();renderFilters();renderContent();renderNotice();if(rebuild) scheduleNotifications()}
 function applyTheme(){const pref=state.prefs.theme||'auto';const dark= pref==='auto'?matchMedia('(prefers-color-scheme: dark)').matches:pref==='dark';document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]').setAttribute('content',dark?'#0b1220':'#f4f7fb')}
 function syncControls(){document.getElementById('searchInput').value=state.prefs.query||'';document.getElementById('stateFilter').value=state.prefs.stateFilter||'all';document.getElementById('sortSelect').value=state.prefs.sort||'dateAsc';document.getElementById('themeSelect').value=state.prefs.theme||'auto';const catSel=document.getElementById('categoryFilter');catSel.innerHTML='<option value="all">Todas las categorías</option>'+state.categories.map(c=>`<option value="${escapeHTML(c.name)}">${escapeHTML(c.name)}</option>`).join('');catSel.value=state.prefs.categoryFilter||'all';document.querySelectorAll('#viewTabs button').forEach(b=>b.classList.toggle('active',b.dataset.view===state.prefs.view));document.getElementById('pendingText').textContent=`${state.reminders.filter(r=>r.status==='pending').length} pendientes`}
-function renderNotice(){const n=document.getElementById('notice');if(!('Notification' in window)){n.textContent='Este navegador no soporta notificaciones nativas.';n.classList.add('show');return}if(state.prefs.notifications&&Notification.permission!=='granted'){n.textContent='Las notificaciones están configuradas, pero falta permiso del navegador.';n.classList.add('show');return}n.classList.remove('show')}
+function renderNotice(){const n=document.getElementById('notice');if(!isFirebaseReady){n.textContent='Modo local: para sincronizar entre dispositivos Firestore debe estar habilitado y con reglas de lectura/escritura para la app.';n.classList.add('show');return}if(!('Notification' in window)){n.textContent='Este navegador no soporta notificaciones nativas.';n.classList.add('show');return}if(state.prefs.notifications&&Notification.permission!=='granted'){n.textContent='Las notificaciones están configuradas, pero falta permiso del navegador.';n.classList.add('show');return}n.classList.remove('show')}
 function filteredReminders(){const q=(state.prefs.query||'').toLowerCase().trim();return state.reminders.filter(r=>{const blob=[r.title,r.desc,r.cat,statusLabel(r.status),r.status,r.date,formatDate(r.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}),r.time,r.endTime,timeRange(r),priorityLabel(r.priority)].join(' ').toLowerCase();if(q&&!blob.includes(q))return false;if(state.prefs.stateFilter!=='all'&&r.status!==state.prefs.stateFilter)return false;if(state.prefs.categoryFilter!=='all'&&!same(r.cat,state.prefs.categoryFilter))return false;return true})}
 function renderFilters(){const el=document.getElementById('quickFilters');const list=state.categories.map(c=>({c,count:state.reminders.filter(r=>same(r.cat,c.name)).length})).sort((a,b)=>b.count-a.count);el.innerHTML=`<button class="chip ${state.prefs.categoryFilter==='all'?'active':''}" onclick="setCatFilter('all')">Todas · ${state.reminders.length}</button>`+list.map(({c,count})=>`<button class="chip ${same(state.prefs.categoryFilter,c.name)?'active':''}" onclick="setCatFilter('${escapeHTML(c.name)}')" style="border-color:${c.color};color:${same(state.prefs.categoryFilter,c.name)?'#fff':c.color}">${escapeHTML(c.name)} · ${count}</button>`).join('')}
 function renderContent(){const view=state.prefs.view||'week';if(view==='day')return renderDay();if(view==='month')return renderMonth();if(view==='list')return renderList();return renderWeek()}
@@ -284,259 +356,7 @@ function saveSettings(){state.prefs.theme=document.getElementById('themeSelect')
 document.getElementById('rTime').addEventListener('change',()=>{const start=document.getElementById('rTime').value||'09:00';const end=document.getElementById('rEndTime').value;if(!end||end<=start)document.getElementById('rEndTime').value=addMinutesToTime(start,60)});
 document.getElementById('rEndTime').addEventListener('change',()=>{const start=document.getElementById('rTime').value||'09:00';const end=document.getElementById('rEndTime').value;if(end&&end<=start){document.getElementById('rEndTime').value=addMinutesToTime(start,60);toast('La hora de fin debe ser posterior al inicio')}});
 renderAll(true);
-</script>
-</body>
-</html>
-}
-.event-menu{
-  right:6px;
-  top:6px;
-  flex-shrink:0;
-}
-.slot{
-  overflow-y:auto;
-  overflow-x:hidden;
-  scrollbar-width:none;
-}
-.slot::-webkit-scrollbar{display:none}
-.list-title{
-  white-space:normal;
-  overflow:visible;
-  text-overflow:clip;
-  overflow-wrap:anywhere;
-  line-height:1.24;
-}
-@media(max-width:700px){
-  .event{
-    min-height:auto;
-    padding:7px 30px 7px 8px;
-    border-radius:13px;
-  }
-  .event-title{
-    font-size:11px;
-    line-height:1.24;
-    letter-spacing:-.01em;
-  }
-  .slot{
-    overflow-y:auto;
-    overflow-x:hidden;
-  }
-}
-@media(max-width:390px){
-  .event-title{font-size:10.5px;line-height:1.24}
-  .event{padding-right:29px}
-}
-
-</style>
-</head>
-<body>
-<div class="app">
-  <header class="header">
-    <div class="top">
-      <div class="brand"><h1>Agenda</h1><p id="pendingText">0 pendientes</p></div>
-      <button class="icon-btn" onclick="openStats()" title="Estadísticas">Σ</button>
-      <button class="icon-btn" onclick="openCategoryModal()" title="Categorías">☰</button>
-      <button class="icon-btn" onclick="openSettings()" title="Ajustes">⚙</button>
-    </div>
-    <div class="search-row">
-      <div class="search"><input id="searchInput" placeholder="Buscar por título, descripción, categoría, estado, fecha u hora" autocomplete="off"><span>⌕</span></div>
-      <select id="stateFilter" class="select"><option value="all">Todos los estados</option><option value="pending">Pendientes</option><option value="done">Completados</option><option value="overdue">Vencidos</option></select>
-      <select id="categoryFilter" class="select"><option value="all">Todas las categorías</option></select>
-    </div>
-    <div id="notice" class="notice"></div>
-  </header>
-  <section class="toolbar" id="quickFilters"></section>
-  <main class="main-panel" id="swipeZone">
-    <div class="panel-nav">
-      <button class="nav-btn" onclick="navigate(-1)">‹</button>
-      <button class="today-btn" onclick="goToday()">Hoy</button>
-      <button class="nav-btn" onclick="navigate(1)">›</button>
-      <div class="range" id="rangeText"></div>
-      <div class="view-tabs" id="viewTabs">
-        <button data-view="week">Semana</button><button data-view="day">Día</button><button data-view="month">Mes</button><button data-view="list">Lista</button>
-      </div>
-    </div>
-    <div class="content-area" id="content"></div>
-  </main>
-</div>
-<button class="fab" onclick="openReminderModal(null)">+</button>
-
-<div class="modal" id="reminderModal"><section class="sheet"><div class="sheet-head"><div><h2 id="reminderModalTitle">Nuevo recordatorio</h2><p>Crear, editar, repetir y configurar aviso.</p></div><button class="close" onclick="closeModal('reminderModal')">×</button></div><div class="form">
-  <div class="field full"><label>Título</label><input id="rTitle"></div>
-  <div class="field full"><label>Descripción</label><textarea id="rDesc"></textarea></div>
-  <div class="field"><label>Fecha</label><input id="rDate" type="date"></div><div class="field"><label>Desde</label><input id="rTime" type="time"></div>
-  <div class="field"><label>Hasta</label><input id="rEndTime" type="time"></div>
-  <div class="field"><label>Categoría</label><select id="rCat"></select></div><div class="field"><label>Estado</label><select id="rStatus"><option value="pending">Pendiente</option><option value="done">Completado</option><option value="overdue">Vencido</option></select></div>
-  <div class="field"><label>Prioridad</label><select id="rPriority"><option value="low">Baja</option><option value="normal">Normal</option><option value="high">Alta</option></select></div><div class="field"><label>Aviso</label><select id="rAlert"><option value="none">Sin aviso</option><option value="5">5 minutos antes</option><option value="10">10 minutos antes</option><option value="30">30 minutos antes</option><option value="60">1 hora antes</option><option value="1440">1 día antes</option></select></div>
-  <div class="field"><label>Recurrencia</label><select id="rRecurrence"><option value="none">No repetir</option><option value="daily">Todos los días</option><option value="interval">Cada N días</option><option value="weekly">Cada semana</option><option value="monthly">Cada mes</option><option value="weekdays">Días específicos de la semana</option><option value="monthdates">Fechas específicas del mes</option></select></div><div class="field"><label>N días / hasta</label><input id="rInterval" type="number" min="2" value="2"></div>
-  <div class="field full"><label>Días específicos</label><div class="days" id="rWeekdays"></div></div>
-  <div class="field full"><label>Fechas específicas del mes</label><input id="rMonthDates" placeholder="Ejemplo: 1, 10, 25"></div>
-  <div class="field"><label>Repetir hasta</label><input id="rUntil" type="date"></div>
-</div><div class="actions"><button class="ghost" onclick="closeModal('reminderModal')">Cancelar</button><button class="primary" onclick="saveReminderFromModal()">Guardar</button></div></section></div>
-
-<div class="modal" id="detailModal"><section class="sheet"><div class="sheet-head"><div><h2 id="dTitle"></h2><p id="dSub"></p></div><button class="close" onclick="closeModal('detailModal')">×</button></div><div id="dBody"></div><div class="actions"><button class="ghost" onclick="markActive('done')">Hecho</button><button class="danger ghost" onclick="markActive('overdue')">Vencido</button><button class="primary" onclick="openActionMenu()">Opciones</button></div></section></div>
-<div class="modal" id="actionModal"><section class="sheet"><div class="sheet-head"><div><h2>Opciones</h2><p id="actionSub"></p></div><button class="close" onclick="closeModal('actionModal')">×</button></div><div class="menu-list"><button onclick="editActive()">Editar recordatorio</button><button onclick="copyActive()">Copiar detalles como texto</button><button onclick="shareActiveWhatsApp()">Compartir por WhatsApp</button><button onclick="exportActiveICS()">Exportar .ics</button><button onclick="deleteActive()" style="color:#f87171">Eliminar recordatorio</button></div></section></div>
-
-<div class="modal" id="scopeModal"><section class="sheet"><div class="sheet-head"><div><h2 id="scopeTitle">Aplicar cambio</h2><p>Este recordatorio pertenece a una serie recurrente.</p></div><button class="close" onclick="closeModal('scopeModal')">×</button></div><div class="menu-list"><button onclick="applyScope('single')">Solo este recordatorio</button><button onclick="applyScope('future')">Este y los siguientes</button><button onclick="applyScope('all')">Toda la serie</button></div></section></div>
-
-<div class="modal" id="categoryModal"><section class="sheet"><div class="sheet-head"><div><h2>Categorías</h2><p>Color personalizado para tarjetas, bordes, etiquetas e indicadores.</p></div><button class="close" onclick="closeModal('categoryModal')">×</button></div><div id="catList"></div><div class="form"><div class="field"><label>Nombre</label><input id="newCatName" placeholder="Nueva categoría"></div><div class="field"><label>Color</label><input id="newCatColor" type="color" value="#3b82f6"></div></div><div class="actions"><button class="ghost" onclick="closeModal('categoryModal')">Cerrar</button><button class="primary" onclick="addCategory()">Agregar</button></div></section></div>
-
-<div class="modal" id="settingsModal"><section class="sheet"><div class="sheet-head"><div><h2>Ajustes</h2><p>Vista, tema, notificaciones y orden.</p></div><button class="close" onclick="closeModal('settingsModal')">×</button></div><div class="form"><div class="field"><label>Tema</label><select id="themeSelect"><option value="auto">Automático</option><option value="light">Claro</option><option value="dark">Oscuro</option></select></div><div class="field"><label>Orden lista</label><select id="sortSelect"><option value="dateAsc">Fecha ascendente</option><option value="dateDesc">Fecha descendente</option><option value="category">Categoría</option><option value="status">Estado</option><option value="priority">Prioridad</option><option value="az">Nombre A-Z</option><option value="za">Nombre Z-A</option></select></div><div class="field full"><label>Notificaciones</label><button class="primary" style="height:44px;border-radius:14px" onclick="enableNotifications()">Activar notificaciones nativas</button></div></div><div class="actions"><button class="primary" onclick="saveSettings()">Guardar ajustes</button></div></section></div>
-
-<div class="modal" id="statsModal"><section class="sheet"><div class="sheet-head"><div><h2>Estadísticas</h2><p>Resumen actualizado automáticamente.</p></div><button class="close" onclick="closeModal('statsModal')">×</button></div><div class="stats-grid" id="statsGrid"></div><div id="statsExtra" style="margin-top:12px"></div></section></div>
-<div class="toast" id="toast"></div>
-
-<script>
-/* ========================= ESTADO GLOBAL ========================= */
-const STORE_KEY='agenda_recordatorios_v3';
-const HOURS=Array.from({length:18},(_,i)=>String(i+6).padStart(2,'0')+':00');
-const DAY_NAMES=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-const WEEKDAY_SHORT=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-const DEFAULT_COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#64748b'];
-const DEFAULT_STATE={
-  reminders:[
-    {id:'r1',title:'Avisar turnos a Fernanda',desc:'Confirmar disponibilidad y enviar aviso del turno por WhatsApp.',date:'2026-06-08',time:'15:00',cat:'Masajes',status:'pending',priority:'normal',alert:'none'},
-    {id:'r2',title:'Confirmar agenda de Milagros',desc:'Revisar horario reservado y dejar asentada la confirmación.',date:'2026-06-09',time:'09:00',cat:'Masajes',status:'done',priority:'normal',alert:'none'},
-    {id:'r3',title:'Revisar pagos pendientes',desc:'Controlar pagos vencidos y marcar los comprobantes que falten verificar.',date:'2026-06-10',time:'08:00',cat:'Finanzas',status:'overdue',priority:'high',alert:'none'},
-    {id:'r4',title:'Enviar recordatorio a Ernesto',desc:'Enviar mensaje breve con día, hora y sala asignada.',date:'2026-06-10',time:'11:00',cat:'Personal',status:'pending',priority:'normal',alert:'none'},
-    {id:'r5',title:'Preparar sala C3',desc:'Dejar camilla, insumos y ficha del paciente listos antes del turno.',date:'2026-06-11',time:'15:00',cat:'Consultorio',status:'done',priority:'normal',alert:'none'},
-    {id:'r6',title:'Cancelar turno duplicado',desc:'Resolver duplicación de agenda y avisar al contacto afectado.',date:'2026-06-11',time:'15:00',cat:'Turnos',status:'overdue',priority:'high',alert:'none'},
-    {id:'r7',title:'Llamar a Yami',desc:'Coordinar nueva disponibilidad y registrar respuesta.',date:'2026-06-11',time:'15:00',cat:'Personal',status:'pending',priority:'normal',alert:'none'},
-    {id:'r8',title:'Actualizar horarios del sábado',desc:'Revisar cambios del sábado y publicar la grilla actualizada.',date:'2026-06-13',time:'10:00',cat:'Agenda',status:'pending',priority:'low',alert:'none'},
-    {id:'r9',title:'Cierre semanal',desc:'Revisar pendientes, completados y vencidos antes de cerrar la semana.',date:'2026-06-14',time:'19:00',cat:'Panel',status:'pending',priority:'normal',alert:'none'}
-  ],
-  categories:[
-    {name:'Masajes',color:'#10b981'},{name:'Finanzas',color:'#f59e0b'},{name:'Consultorio',color:'#3b82f6'},{name:'Turnos',color:'#ef4444'},{name:'Agenda',color:'#8b5cf6'},{name:'Panel',color:'#06b6d4'},{name:'Personal',color:'#64748b'}
-  ],
-  prefs:{view:'week',theme:'auto',sort:'dateAsc',stateFilter:'all',categoryFilter:'all',query:'',notifications:false,order:'dateAsc'},
-  cursorDate:todayISO()
-};
-let state=loadState();
-let activeId=null;let editingId=null;let pendingScopeAction=null;let draggedId=null;let lastTouch={x:0,y:0,t:0};let notificationTimers=[];
-
-/* ========================= PERSISTENCIA ========================= */
-function loadState(){try{const raw=localStorage.getItem(STORE_KEY);if(raw){const parsed=JSON.parse(raw);return normalizeState(parsed)}}catch(e){}return normalizeState(structuredClone(DEFAULT_STATE))}
-function saveState(){state.prefs.order=state.prefs.sort;localStorage.setItem(STORE_KEY,JSON.stringify(state));scheduleNotifications();renderAll(false)}
-function normalizeState(s){s=s||{};s.reminders=Array.isArray(s.reminders)?s.reminders:[];s.categories=Array.isArray(s.categories)?s.categories:structuredClone(DEFAULT_STATE.categories);s.prefs={...DEFAULT_STATE.prefs,...(s.prefs||{})};s.cursorDate=s.cursorDate||todayISO();const seen=new Set();s.reminders=s.reminders.filter(r=>{if(!r.id||seen.has(r.id))return false;seen.add(r.id);return true}).map(r=>normalizeReminderTime({desc:'',priority:'normal',alert:'none',status:'pending',...r,cat:cleanCat(r.cat||'Personal')}));s.categories=s.categories.map((c,i)=>({name:cleanCat(c.name||String(c)||'Categoría'),color:c.color||DEFAULT_COLORS[i%DEFAULT_COLORS.length]}));ensureCategoriesForReminders(s);return s}
-function ensureCategoriesForReminders(s=state){s.reminders.forEach(r=>{if(!s.categories.some(c=>same(c.name,r.cat)))s.categories.push({name:r.cat,color:DEFAULT_COLORS[s.categories.length%DEFAULT_COLORS.length]})})}
-
-/* ========================= UTILIDADES ========================= */
-function id(){return 'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
-function same(a,b){return cleanCat(a).toLowerCase()===cleanCat(b).toLowerCase()}
-function cleanCat(v){return String(v||'').replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu,'').replace(/[^\p{L}\p{N}\s-]/gu,'').replace(/\s+/g,' ').trim()||'Personal'}
-function todayISO(){const d=new Date();d.setHours(0,0,0,0);return toISO(d)}
-function toISO(d){const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)}
-function fromISO(s){const d=new Date(String(s||todayISO())+'T00:00:00');d.setHours(0,0,0,0);return d}
-function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
-function addMonths(d,n){const x=new Date(d);x.setMonth(x.getMonth()+n);return x}
-function mondayOf(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x}
-function formatDate(s,opts={day:'numeric',month:'short'}){return fromISO(s).toLocaleDateString('es-AR',opts).replace('.','')}
-function escapeHTML(s){return String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
-function catObj(name){return state.categories.find(c=>same(c.name,name))||{name:cleanCat(name),color:'#64748b'}}
-function catStyle(name){const c=catObj(name);return `--cat:${c.color};--cat-soft:${hexToRgba(c.color,.16)}`}
-function hexToRgba(hex,a){hex=String(hex||'#64748b').replace('#','');if(hex.length===3)hex=hex.split('').map(x=>x+x).join('');const n=parseInt(hex,16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`}
-function statusLabel(s){return s==='done'?'Completado':s==='overdue'?'Vencido':'Pendiente'}
-function priorityLabel(p){return p==='high'?'Alta':p==='low'?'Baja':'Normal'}
-function addMinutesToTime(time,minutes){const [h,m]=String(time||'09:00').split(':').map(Number);const total=((h||0)*60+(m||0)+minutes+1440)%1440;return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0')}
-function normalizeReminderTime(r){r.time=r.time||'09:00';r.endTime=r.endTime||addMinutesToTime(r.time,60);if(r.endTime<=r.time)r.endTime=addMinutesToTime(r.time,60);return r}
-function timeRange(r){return `${r.time||'09:00'} - ${r.endTime||addMinutesToTime(r.time||'09:00',60)}`}
-function timeToMinutes(t){const [h,m]=String(t||'00:00').split(':').map(Number);return (h||0)*60+(m||0)}
-function durationMinutes(r){const diff=timeToMinutes(r.endTime||addMinutesToTime(r.time||'09:00',60))-timeToMinutes(r.time||'09:00');return diff>0?diff:60}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),2200)}
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
-
-/* ========================= RENDERIZADO ========================= */
-function renderAll(rebuild=true){applyTheme();syncControls();renderFilters();renderContent();renderNotice();if(rebuild) scheduleNotifications()}
-function applyTheme(){const pref=state.prefs.theme||'auto';const dark= pref==='auto'?matchMedia('(prefers-color-scheme: dark)').matches:pref==='dark';document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]').setAttribute('content',dark?'#0b1220':'#f4f7fb')}
-function syncControls(){document.getElementById('searchInput').value=state.prefs.query||'';document.getElementById('stateFilter').value=state.prefs.stateFilter||'all';document.getElementById('sortSelect').value=state.prefs.sort||'dateAsc';document.getElementById('themeSelect').value=state.prefs.theme||'auto';const catSel=document.getElementById('categoryFilter');catSel.innerHTML='<option value="all">Todas las categorías</option>'+state.categories.map(c=>`<option value="${escapeHTML(c.name)}">${escapeHTML(c.name)}</option>`).join('');catSel.value=state.prefs.categoryFilter||'all';document.querySelectorAll('#viewTabs button').forEach(b=>b.classList.toggle('active',b.dataset.view===state.prefs.view));document.getElementById('pendingText').textContent=`${state.reminders.filter(r=>r.status==='pending').length} pendientes`}
-function renderNotice(){const n=document.getElementById('notice');if(!('Notification' in window)){n.textContent='Este navegador no soporta notificaciones nativas.';n.classList.add('show');return}if(state.prefs.notifications&&Notification.permission!=='granted'){n.textContent='Las notificaciones están configuradas, pero falta permiso del navegador.';n.classList.add('show');return}n.classList.remove('show')}
-function filteredReminders(){const q=(state.prefs.query||'').toLowerCase().trim();return state.reminders.filter(r=>{const blob=[r.title,r.desc,r.cat,statusLabel(r.status),r.status,r.date,formatDate(r.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}),r.time,r.endTime,timeRange(r),priorityLabel(r.priority)].join(' ').toLowerCase();if(q&&!blob.includes(q))return false;if(state.prefs.stateFilter!=='all'&&r.status!==state.prefs.stateFilter)return false;if(state.prefs.categoryFilter!=='all'&&!same(r.cat,state.prefs.categoryFilter))return false;return true})}
-function renderFilters(){const el=document.getElementById('quickFilters');const list=state.categories.map(c=>({c,count:state.reminders.filter(r=>same(r.cat,c.name)).length})).sort((a,b)=>b.count-a.count);el.innerHTML=`<button class="chip ${state.prefs.categoryFilter==='all'?'active':''}" onclick="setCatFilter('all')">Todas · ${state.reminders.length}</button>`+list.map(({c,count})=>`<button class="chip ${same(state.prefs.categoryFilter,c.name)?'active':''}" onclick="setCatFilter('${escapeHTML(c.name)}')" style="border-color:${c.color};color:${same(state.prefs.categoryFilter,c.name)?'#fff':c.color}">${escapeHTML(c.name)} · ${count}</button>`).join('')}
-function renderContent(){const view=state.prefs.view||'week';if(view==='day')return renderDay();if(view==='month')return renderMonth();if(view==='list')return renderList();return renderWeek()}
-function renderWeek(){const start=mondayOf(fromISO(state.cursorDate));const days=Array.from({length:7},(_,i)=>addDays(start,i));document.getElementById('rangeText').textContent=`${formatDate(toISO(days[0]))} - ${formatDate(toISO(days[6]))}`;let html='<div class="grid week-grid"><div class="corner"></div>';days.forEach((d,i)=>{const iso=toISO(d);html+=`<div class="day-head ${iso===todayISO()?'today':''}"><div><div class="day-num">${d.getDate()}</div><div class="day-name">${DAY_NAMES[i]}</div></div></div>`});const list=filteredReminders();HOURS.forEach(h=>{html+=`<div class="time-cell">${h}</div>`;days.forEach(d=>{const date=toISO(d);const items=list.filter(r=>r.date===date&&hourOf(r.time)===hourOf(h)).sort((a,b)=>a.time.localeCompare(b.time));html+=slotHTML(date,h,items)})});html+='</div>';setContentOrEmpty(html,list)}
-function renderDay(){const date=state.cursorDate;document.getElementById('rangeText').textContent=formatDate(date,{weekday:'long',day:'numeric',month:'long'});const list=filteredReminders();let html='<div class="grid day-grid"><div class="corner"></div>';html+=`<div class="day-head ${date===todayISO()?'today':''}"><div><div class="day-num">${fromISO(date).getDate()}</div><div class="day-name">${formatDate(date,{weekday:'long'})}</div></div></div>`;HOURS.forEach(h=>{const items=list.filter(r=>r.date===date&&hourOf(r.time)===hourOf(h)).sort((a,b)=>a.time.localeCompare(b.time));html+=`<div class="time-cell">${h}</div>${slotHTML(date,h,items)}`});html+='</div>';setContentOrEmpty(html,list)}
-function slotHTML(date,h,items){return `<div class="slot" data-date="${date}" data-hour="${h}" onclick="quickCreate('${date}','${h}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropReminder(event,'${date}','${h}')">${items.map(renderEvent).join('')}</div>`}
-function renderEvent(r){return `<article class="event" style="${catStyle(r.cat)}" draggable="true" ondragstart="dragStart(event,'${r.id}')" onpointerdown="pointerStart(event,'${r.id}')" onpointerup="pointerEnd(event,'${r.id}')" onclick="event.stopPropagation();openDetail('${r.id}')"><button class="event-menu" onclick="event.stopPropagation();activeId='${r.id}';openActionMenu()">⋯</button><div class="event-title" ondblclick="event.stopPropagation();inlineEditTitle(this,'${r.id}')">${escapeHTML(r.title)}</div><div class="event-meta"><span class="pill mobile-hide">${escapeHTML(timeRange(r))}</span><span class="pill">${escapeHTML(r.cat)}</span><span class="pill">${statusLabel(r.status)}</span></div></article>`}
-function setContentOrEmpty(html,list){document.getElementById('content').innerHTML=list.length?html:'<div class="empty">No se encontraron recordatorios</div>'}
-function renderList(){document.getElementById('rangeText').textContent='Vista lista';let list=sortList(filteredReminders());let html='<div class="list-wrap"><div class="list-controls"><select class="select" onchange="state.prefs.sort=this.value;saveState()"><option value="dateAsc">Fecha ascendente</option><option value="dateDesc">Fecha descendente</option><option value="category">Categoría</option><option value="status">Estado</option><option value="priority">Prioridad</option><option value="az">Nombre A-Z</option><option value="za">Nombre Z-A</option></select></div>';if(!list.length){document.getElementById('content').innerHTML='<div class="empty">No se encontraron recordatorios</div>';return}html+=list.map(r=>`<div class="list-item" style="${catStyle(r.cat)}" onclick="openDetail('${r.id}')"><div class="list-icon">${iconFor(r.cat)}</div><div><div class="list-title">${escapeHTML(r.title)}</div><div class="list-meta"><span class="pill">${formatDate(r.date)} · ${timeRange(r)}</span><span class="pill">${escapeHTML(r.cat)}</span><span class="pill">${statusLabel(r.status)}</span><span class="pill">Prioridad ${priorityLabel(r.priority)}</span></div></div><button class="icon-btn" onclick="event.stopPropagation();activeId='${r.id}';openActionMenu()">⋯</button></div>`).join('')+'</div>';document.getElementById('content').innerHTML=html;document.querySelector('.list-controls select').value=state.prefs.sort}
-function renderMonth(){const base=fromISO(state.cursorDate);const y=base.getFullYear(),m=base.getMonth();document.getElementById('rangeText').textContent=base.toLocaleDateString('es-AR',{month:'long',year:'numeric'});const first=new Date(y,m,1);const start=addDays(first,-((first.getDay()+6)%7));const list=filteredReminders();let html='<div class="month"><div class="month-grid">'+DAY_NAMES.map(d=>`<div class="month-head">${d}</div>`).join('');for(let i=0;i<42;i++){const d=addDays(start,i),date=toISO(d);const items=list.filter(r=>r.date===date).sort((a,b)=>a.time.localeCompare(b.time));html+=`<div class="month-day ${d.getMonth()!==m?'out':''} ${date===todayISO()?'today':''}" onclick="state.cursorDate='${date}';state.prefs.view='day';saveState()"><div class="month-num">${d.getDate()}</div>${items.slice(0,3).map(r=>`<div class="month-event" style="${catStyle(r.cat)}">${escapeHTML(timeRange(r))} ${escapeHTML(r.title)}</div>`).join('')}${items.length>3?`<div class="month-event">+${items.length-3} más</div>`:''}</div>`}html+='</div></div>';document.getElementById('content').innerHTML=html;if(!list.length&&state.prefs.query)document.getElementById('content').innerHTML='<div class="empty">No se encontraron recordatorios</div>'}
-function sortList(list){const order=state.prefs.sort||'dateAsc';const rank={high:0,normal:1,low:2};return list.slice().sort((a,b)=>{if(order==='dateDesc')return (b.date+b.time).localeCompare(a.date+a.time);if(order==='category')return a.cat.localeCompare(b.cat)||a.date.localeCompare(b.date);if(order==='status')return a.status.localeCompare(b.status)||a.date.localeCompare(b.date);if(order==='priority')return (rank[a.priority]??1)-(rank[b.priority]??1)||a.date.localeCompare(b.date);if(order==='az')return a.title.localeCompare(b.title);if(order==='za')return b.title.localeCompare(a.title);return (a.date+a.time).localeCompare(b.date+b.time)})}
-function hourOf(t){return String(t||'00:00').slice(0,2)+':00'}
-function iconFor(cat){const k=cleanCat(cat).toLowerCase();if(k.includes('finanza'))return '💰';if(k.includes('masaje'))return '💆';if(k.includes('consultorio'))return '🏥';if(k.includes('turno'))return '📅';if(k.includes('panel'))return '📊';if(k.includes('agenda'))return '📆';return '📌'}
-
-/* ========================= EVENTOS ========================= */
-document.getElementById('searchInput').addEventListener('input',e=>{state.prefs.query=e.target.value;saveState()});
-document.getElementById('stateFilter').addEventListener('change',e=>{state.prefs.stateFilter=e.target.value;saveState()});
-document.getElementById('categoryFilter').addEventListener('change',e=>{state.prefs.categoryFilter=e.target.value;saveState()});
-document.getElementById('viewTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state.prefs.view=b.dataset.view;saveState()});
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(state.prefs.theme==='auto')renderAll(false)});
-function setCatFilter(cat){state.prefs.categoryFilter=cat;saveState()}
-function navigate(dir){const v=state.prefs.view;if(v==='day')state.cursorDate=toISO(addDays(fromISO(state.cursorDate),dir));else if(v==='month')state.cursorDate=toISO(addMonths(fromISO(state.cursorDate),dir));else state.cursorDate=toISO(addDays(fromISO(state.cursorDate),dir*7));saveState()}
-function goToday(){state.cursorDate=todayISO();saveState()}
-function quickCreate(date,hour){openReminderModal({date,time:hour})}
-function openReminderModal(seed){editingId=typeof seed==='string'?seed:null;const r=editingId?state.reminders.find(x=>x.id===editingId):null;document.getElementById('reminderModalTitle').textContent=r?'Editar recordatorio':'Nuevo recordatorio';populateCategorySelect('rCat',r?.cat);document.getElementById('rTitle').value=r?.title||'';document.getElementById('rDesc').value=r?.desc||'';document.getElementById('rDate').value=r?.date||seed?.date||state.cursorDate||todayISO();document.getElementById('rTime').value=r?.time||seed?.time||'09:00';document.getElementById('rEndTime').value=r?.endTime||addMinutesToTime(document.getElementById('rTime').value,60);document.getElementById('rCat').value=r?.cat||state.categories[0]?.name||'Personal';document.getElementById('rStatus').value=r?.status||'pending';document.getElementById('rPriority').value=r?.priority||'normal';document.getElementById('rAlert').value=r?.alert||'none';document.getElementById('rRecurrence').value='none';document.getElementById('rInterval').value=2;document.getElementById('rUntil').value=toISO(addDays(fromISO(document.getElementById('rDate').value),90));document.getElementById('rMonthDates').value='';renderWeekdayInputs(r);openModal('reminderModal')}
-function populateCategorySelect(id,selected){document.getElementById(id).innerHTML=state.categories.map(c=>`<option value="${escapeHTML(c.name)}" ${same(c.name,selected)?'selected':''}>${escapeHTML(c.name)}</option>`).join('')}
-function renderWeekdayInputs(r){const box=document.getElementById('rWeekdays');box.innerHTML=WEEKDAY_SHORT.map((d,i)=>`<label class="toggle"><input type="checkbox" value="${i}" ${r?.recurrence?.weekdays?.includes(i)?'checked':''}>${d}</label>`).join('')}
-function saveReminderFromModal(){const base={title:document.getElementById('rTitle').value.trim()||'Nuevo recordatorio',desc:document.getElementById('rDesc').value.trim(),date:document.getElementById('rDate').value,time:document.getElementById('rTime').value||'09:00',endTime:document.getElementById('rEndTime').value||addMinutesToTime(document.getElementById('rTime').value||'09:00',60),cat:document.getElementById('rCat').value,status:document.getElementById('rStatus').value,priority:document.getElementById('rPriority').value,alert:document.getElementById('rAlert').value};normalizeReminderTime(base);if(editingId){const r=state.reminders.find(x=>x.id===editingId);if(!r)return;if(r.seriesId){pendingScopeAction={type:'edit',id:editingId,data:base};openModal('scopeModal');return}Object.assign(r,base);closeModal('reminderModal');saveState();toast('Recordatorio actualizado');return}const rec=readRecurrence();if(rec.type==='none'){state.reminders.push({id:id(),...base});}else{createRecurring(base,rec)}closeModal('reminderModal');saveState();toast('Recordatorio guardado')}
-function readRecurrence(){const type=document.getElementById('rRecurrence').value;return{type,interval:Number(document.getElementById('rInterval').value||2),until:document.getElementById('rUntil').value,weekdays:[...document.querySelectorAll('#rWeekdays input:checked')].map(x=>Number(x.value)),monthdates:document.getElementById('rMonthDates').value.split(',').map(x=>Number(x.trim())).filter(n=>n>=1&&n<=31)}}
-function createRecurring(base,rec){const seriesId='s'+Date.now().toString(36);const start=fromISO(base.date),until=fromISO(rec.until||toISO(addDays(start,365)));let dates=[];for(let d=new Date(start);d<=until;d=addDays(d,1)){const day=d.getDay(),date=d.getDate();let ok=false;if(rec.type==='daily')ok=true;if(rec.type==='interval')ok=Math.round((d-start)/86400000)%Math.max(1,rec.interval)===0;if(rec.type==='weekly')ok=day===start.getDay();if(rec.type==='monthly')ok=date===start.getDate();if(rec.type==='weekdays')ok=rec.weekdays.includes(day);if(rec.type==='monthdates')ok=rec.monthdates.includes(date);if(ok)dates.push(toISO(d))}dates.forEach((date,index)=>state.reminders.push({id:id(),...base,date,seriesId,seriesIndex:index,recurrence:rec}))}
-function openDetail(idv){activeId=idv;const r=state.reminders.find(x=>x.id===idv);if(!r)return;document.getElementById('dTitle').textContent=r.title;document.getElementById('dSub').textContent=`${formatDate(r.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'})} · ${timeRange(r)}`;document.getElementById('dBody').innerHTML=`<div class="list-item" style="${catStyle(r.cat)}"><div class="list-icon">${iconFor(r.cat)}</div><div><div class="list-title">${escapeHTML(r.title)}</div><div class="list-meta"><span class="pill">${escapeHTML(r.cat)}</span><span class="pill">${statusLabel(r.status)}</span><span class="pill">Prioridad ${priorityLabel(r.priority)}</span><span class="pill">Aviso: ${alertLabel(r.alert)}</span>${r.seriesId?'<span class="pill">Recurrente</span>':''}</div></div></div><p style="margin-top:12px;line-height:1.5;color:var(--muted);font-weight:700">${escapeHTML(r.desc||'Sin descripción.')}</p>`;openModal('detailModal')}
-function alertLabel(a){return a==='none'?'Sin aviso':a==='1440'?'1 día antes':`${a} minutos antes`}
-function markActive(status){const r=state.reminders.find(x=>x.id===activeId);if(r){r.status=status;closeModal('detailModal');saveState()}}
-function openActionMenu(){const r=state.reminders.find(x=>x.id===activeId);if(!r)return;document.getElementById('actionSub').textContent=r.title;openModal('actionModal')}
-function editActive(){closeModal('actionModal');closeModal('detailModal');openReminderModal(activeId)}
-function deleteActive(){const r=state.reminders.find(x=>x.id===activeId);if(!r)return;if(r.seriesId){pendingScopeAction={type:'delete',id:activeId};openModal('scopeModal');return}state.reminders=state.reminders.filter(x=>x.id!==activeId);closeModal('actionModal');closeModal('detailModal');saveState();toast('Recordatorio eliminado')}
-function applyScope(scope){const a=pendingScopeAction;if(!a)return;const ref=state.reminders.find(x=>x.id===a.id);if(!ref)return;if(a.type==='delete'){if(scope==='single')state.reminders=state.reminders.filter(x=>x.id!==ref.id);if(scope==='future')state.reminders=state.reminders.filter(x=>x.seriesId!==ref.seriesId||x.date<ref.date);if(scope==='all')state.reminders=state.reminders.filter(x=>x.seriesId!==ref.seriesId)}if(a.type==='edit'){state.reminders.forEach(x=>{if(scope==='single'&&x.id===ref.id)Object.assign(x,a.data);if(scope==='future'&&x.seriesId===ref.seriesId&&x.date>=ref.date)Object.assign(x,a.data,{date:x.date});if(scope==='all'&&x.seriesId===ref.seriesId)Object.assign(x,a.data,{date:x.date})})}pendingScopeAction=null;closeModal('scopeModal');closeModal('reminderModal');closeModal('actionModal');closeModal('detailModal');saveState();toast('Cambio aplicado')}
-
-/* ========================= EDICIÓN DIRECTA ========================= */
-function inlineEditTitle(el,idv){el.contentEditable='true';el.focus();document.execCommand('selectAll',false,null);const original=el.textContent;function finish(save){el.contentEditable='false';if(save){const r=state.reminders.find(x=>x.id===idv);if(r){r.title=el.textContent.trim()||original;saveState()}}else{el.textContent=original}cleanup()}function key(e){if(e.key==='Enter'){e.preventDefault();finish(true)}if(e.key==='Escape'){e.preventDefault();finish(false)}}function blur(){finish(true)}function cleanup(){el.removeEventListener('keydown',key);el.removeEventListener('blur',blur)}el.addEventListener('keydown',key);el.addEventListener('blur',blur,{once:true})}
-
-/* ========================= DRAG AND DROP ========================= */
-function dragStart(e,idv){draggedId=idv;e.dataTransfer.setData('text/plain',idv);e.dataTransfer.effectAllowed='move'}
-function dragOver(e){e.preventDefault();e.currentTarget.classList.add('drop-target')}
-function dragLeave(e){e.currentTarget.classList.remove('drop-target')}
-function dropReminder(e,date,hour){e.preventDefault();e.stopPropagation();e.currentTarget.classList.remove('drop-target');const rid=e.dataTransfer.getData('text/plain')||draggedId;moveReminder(rid,date,hour)}
-function moveReminder(rid,date,hour){const r=state.reminders.find(x=>x.id===rid);if(!r)return;const dur=durationMinutes(r);r.date=date;r.time=hour;r.endTime=addMinutesToTime(hour,dur);state.cursorDate=date;saveState();toast('Fecha y hora actualizadas')}
-function pointerStart(e,idv){lastTouch={x:e.clientX,y:e.clientY,t:Date.now(),id:idv}}
-function pointerEnd(e,idv){if(e.pointerType!=='touch')return;const dx=Math.abs(e.clientX-lastTouch.x),dy=Math.abs(e.clientY-lastTouch.y);if(dx<6&&dy<6)return;const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('.slot');if(el){moveReminder(idv,el.dataset.date,el.dataset.hour)}}
-
-/* ========================= SWIPE ========================= */
-const swipeZone=document.getElementById('swipeZone');swipeZone.addEventListener('touchstart',e=>{lastTouch={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}},{passive:true});swipeZone.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-lastTouch.x,dy=e.changedTouches[0].clientY-lastTouch.y;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.4)navigate(dx<0?1:-1)},{passive:true});
-
-/* ========================= NOTIFICACIONES ========================= */
-async function enableNotifications(){if(!('Notification' in window)){toast('Navegador sin soporte de notificaciones');renderNotice();return}const perm=await Notification.requestPermission();state.prefs.notifications=perm==='granted';saveState();toast(perm==='granted'?'Notificaciones activadas':'Permiso de notificaciones denegado')}
-function scheduleNotifications(){notificationTimers.forEach(clearTimeout);notificationTimers=[];if(!state.prefs.notifications||!('Notification' in window)||Notification.permission!=='granted')return;const now=Date.now();state.reminders.forEach(r=>{if(r.status!=='pending'||r.alert==='none')return;const t=new Date(`${r.date}T${r.time||'00:00'}:00`).getTime()-Number(r.alert)*60000;if(t>now&&t-now<2147483647){notificationTimers.push(setTimeout(()=>new Notification(r.title,{body:`${r.date} · ${timeRange(r)}\n${r.desc||''}`,tag:r.id}),t-now))}})}
-setInterval(()=>scheduleNotifications(),60000);
-
-/* ========================= EXPORTACIÓN ========================= */
-function reminderText(r){return `Título: ${r.title}\nDescripción: ${r.desc||''}\nFecha: ${r.date}\nDesde: ${r.time}\nHasta: ${r.endTime||addMinutesToTime(r.time||'09:00',60)}\nCategoría: ${r.cat}\nEstado: ${statusLabel(r.status)}`}
-async function copyActive(){const r=state.reminders.find(x=>x.id===activeId);if(!r)return;await navigator.clipboard.writeText(reminderText(r));toast('Detalles copiados')}
-function shareActiveWhatsApp(){const r=state.reminders.find(x=>x.id===activeId);if(!r)return;window.open('https://wa.me/?text='+encodeURIComponent(reminderText(r)),'_blank')}
-function icsDate(r){return `${r.date.replaceAll('-','')}T${String(r.time||'00:00').replace(':','')}00`}
-function exportActiveICS(){const r=state.reminders.find(x=>x.id===activeId);if(!r)return;const endTime=new Date(`${r.date}T${r.endTime||addMinutesToTime(r.time||'09:00',60)}:00`);const endISO=toISO(endTime).replaceAll('-','')+'T'+String(endTime.getHours()).padStart(2,'0')+String(endTime.getMinutes()).padStart(2,'0')+'00';const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Agenda Recordatorios//ES','BEGIN:VEVENT',`UID:${r.id}@agenda-local`,`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').split('.')[0]}Z`,`DTSTART:${icsDate(r)}`,`DTEND:${endISO}`,`SUMMARY:${r.title.replace(/\n/g,' ')}`,`DESCRIPTION:${(r.desc||'').replace(/\n/g,'\\n')}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(r.title||'recordatorio').replace(/[^a-z0-9áéíóúñ]+/gi,'_')+'.ics';a.click();URL.revokeObjectURL(a.href);toast('Archivo .ics exportado')}
-
-/* ========================= CATEGORÍAS ========================= */
-function openCategoryModal(){renderCategories();openModal('categoryModal')}
-function renderCategories(){document.getElementById('catList').innerHTML=state.categories.map((c,i)=>`<div class="cat-row"><span class="cat-color" style="background:${c.color}"></span><input value="${escapeHTML(c.name)}" onchange="renameCategory(${i},this.value)"><input type="color" value="${c.color}" onchange="changeCategoryColor(${i},this.value)"><button class="icon-btn" onclick="removeCategory(${i})">×</button></div>`).join('')}
-function addCategory(){const name=cleanCat(document.getElementById('newCatName').value);const color=document.getElementById('newCatColor').value;if(state.categories.some(c=>same(c.name,name))){toast('La categoría ya existe');return}state.categories.push({name,color});document.getElementById('newCatName').value='';saveState();renderCategories();toast('Categoría agregada')}
-function renameCategory(i,val){const old=state.categories[i].name;const name=cleanCat(val);state.categories[i].name=name;state.reminders.forEach(r=>{if(same(r.cat,old))r.cat=name});saveState();renderCategories()}
-function changeCategoryColor(i,color){state.categories[i].color=color;saveState();renderCategories()}
-function removeCategory(i){const name=state.categories[i].name;if(state.reminders.some(r=>same(r.cat,name))){toast('No se elimina una categoría con recordatorios');return}state.categories.splice(i,1);saveState();renderCategories()}
-
-/* ========================= ESTADÍSTICAS ========================= */
-function openStats(){const total=state.reminders.length,done=state.reminders.filter(r=>r.status==='done').length,pending=state.reminders.filter(r=>r.status==='pending').length,overdue=state.reminders.filter(r=>r.status==='overdue').length;const pct=total?Math.round(done*100/total):0;const byCat=countBy(state.reminders,r=>r.cat);const byStatus=countBy(state.reminders,r=>statusLabel(r.status));const byDay=countBy(state.reminders,r=>formatDate(r.date,{weekday:'long'}));const topCat=topKey(byCat)||'-';const topDay=topKey(byDay)||'-';document.getElementById('statsGrid').innerHTML=[['Total',total],['Completados',done],['Pendientes',pending],['Vencidos',overdue],['Cumplimiento',pct+'%'],['Categoría top',topCat],['Día más ocupado',topDay]].map(([k,v])=>`<div class="stat"><strong>${escapeHTML(v)}</strong><span>${escapeHTML(k)}</span></div>`).join('');document.getElementById('statsExtra').innerHTML=`<div class="stat"><span>Cantidad por categoría</span><p>${Object.entries(byCat).map(([k,v])=>`${escapeHTML(k)}: ${v}`).join(' · ')||'-'}</p></div><div class="stat" style="margin-top:10px"><span>Cantidad por estado</span><p>${Object.entries(byStatus).map(([k,v])=>`${escapeHTML(k)}: ${v}`).join(' · ')||'-'}</p></div>`;openModal('statsModal')}
-function countBy(arr,fn){return arr.reduce((a,x)=>{const k=fn(x);a[k]=(a[k]||0)+1;return a},{})}
-function topKey(obj){return Object.entries(obj).sort((a,b)=>b[1]-a[1])[0]?.[0]}
-
-/* ========================= AJUSTES ========================= */
-function openSettings(){document.getElementById('themeSelect').value=state.prefs.theme;document.getElementById('sortSelect').value=state.prefs.sort;openModal('settingsModal')}
-function saveSettings(){state.prefs.theme=document.getElementById('themeSelect').value;state.prefs.sort=document.getElementById('sortSelect').value;closeModal('settingsModal');saveState();toast('Ajustes guardados')}
-
-/* ========================= RESPONSIVE / INICIO ========================= */
-document.getElementById('rTime').addEventListener('change',()=>{const start=document.getElementById('rTime').value||'09:00';const end=document.getElementById('rEndTime').value;if(!end||end<=start)document.getElementById('rEndTime').value=addMinutesToTime(start,60)});
-document.getElementById('rEndTime').addEventListener('change',()=>{const start=document.getElementById('rTime').value||'09:00';const end=document.getElementById('rEndTime').value;if(end&&end<=start){document.getElementById('rEndTime').value=addMinutesToTime(start,60);toast('La hora de fin debe ser posterior al inicio')}});
-renderAll(true);
+initFirebaseSync();
 </script>
 </body>
 </html>
